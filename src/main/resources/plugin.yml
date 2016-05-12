@@ -1,0 +1,11 @@
+name: ${project.name}
+author: manuelgu
+version: ${project.version}
+main: ${project.groupId}.discordmc.${project.name}
+description: ${project.description}
+website: "https://manuelgu.eu"
+
+commands:
+  discord:
+    description: Main Command for DiscordMC
+    usage: /<command> <logout|login|lookup>
