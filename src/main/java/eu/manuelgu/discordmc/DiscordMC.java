@@ -32,25 +32,33 @@ public class DiscordMC extends JavaPlugin {
         Configuration.LOAD_EXTERNAL_MODULES = false;
         Configuration.AUTOMATICALLY_ENABLE_MODULES = false;
 
+        new MessageAPI(this);
+
+        // Client builder and login
         try {
             client = new ClientBuilder().withToken(getConfig().getString("settings.token")).login();
         } catch (DiscordException e) {
             e.printStackTrace();
+            getLogger().severe("Failed to login");
         }
 
+        // Register listeners
         client.getDispatcher().registerListener(new DiscordEventListener(this));
         client.getDispatcher().registerListener(this);
 
+        // Register bukkit listeners and commands
 		getServer().getPluginManager().registerEvents(new BukkitEventListener(this), this);
 		getCommand("discord").setExecutor(new DiscordCommand());
 
-        new MessageAPI(this);
-	}
+    }
 
     @EventSubscriber
     public void onGuildCreate(GuildCreateEvent event) {
+        if (event.getGuild() == null) {
+            return;
+        }
         channel = null;
-        String channelName = getConfig().getString("settings.channel");
+        final String channelName = getConfig().getString("settings.channel");
 
         getClient().getChannels(false).stream().filter(c -> c.getName().equalsIgnoreCase(channelName)).forEach(c -> channel = c);
     }

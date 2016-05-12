@@ -20,9 +20,6 @@ public class BukkitEventListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncPlayerChatEvent event) {
-		if (event.isCancelled()) {
-            return;
-		}
 		if (!plugin.getConfig().getBoolean("settings.send_game_chat")) {
 			return;
 		}

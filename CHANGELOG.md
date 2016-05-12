@@ -6,3 +6,4 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - Fancy logger output
 - Separate /discord command permissions (discordmc.command.#, discordmc.command.login, discordmc.command.logout, discordmc.command.lookup)
 - More reliable connection detection
+- Fix issue with some chat extension plugins

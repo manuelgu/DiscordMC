@@ -26,9 +26,13 @@ public class DiscordEventListener {
     private final DiscordMC plugin;
     private final long RECONNECT_DELAY = TimeUnit.SECONDS.toMillis(15);
     private Timer reconnectTimer;
+    private boolean relayChat;
+    private boolean commands;
 
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
+        relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat");
+        commands = plugin.getConfig().getBoolean("settings.enable_discord_commands");
     }
 
     @EventSubscriber
@@ -37,9 +41,6 @@ public class DiscordEventListener {
         if (!channelName.equalsIgnoreCase(plugin.getConfig().getString("settings.channel"))) {
             return;
         }
-
-        boolean relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat");
-        boolean commands = plugin.getConfig().getBoolean("settings.enable_discord_commands");
 
         if (commands && event.getMessage().getContent().startsWith(plugin.getConfig().getString("settings.command_prefix")) && event.getMessage().getContent().length() > 1) {
             // Commands enabled and it is a valid command
@@ -111,7 +112,7 @@ public class DiscordEventListener {
                         reconnectTimer.cancel();
                     }
                 }
-            }, (long) 0, RECONNECT_DELAY);
+            }, (long) 2, RECONNECT_DELAY);
         } catch (Exception e) {
             e.printStackTrace();
             plugin.getLogger().severe("There was a problem with reconnecting.. Please report the above stacktrace to the developer");

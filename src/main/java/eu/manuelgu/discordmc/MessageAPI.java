@@ -20,10 +20,10 @@ public class MessageAPI {
     }
 
     /**
-     * Send a chat message to the minecraft server
+     * Send a chat message to the Minecraft server
      *
      * @param username player who sent the message
-     * @param message  the actual message that gets sent
+     * @param message  the actual message which gets sent
      */
     public static void sendToMinecraft(String username, String message) {
         String formattedMessage = DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
@@ -34,18 +34,18 @@ public class MessageAPI {
     }
 
     /**
-     * Send a raw message to the minecraft server
+     * Send a raw message to the Minecraft server
      *
-     * @param message raw message that gets sent
+     * @param message raw message which gets sent
      */
     public static void sendRawToMinecraft(String message) {
         Bukkit.broadcastMessage(EmojiParser.parseToAliases(message));
     }
 
     /**
-     * Send a chat message to the discord server
+     * Send a chat message to the Discord server
      *
-     * @param message the message that gets sent
+     * @param message the message which gets sent
      */
     public static void sendToDiscord(String message) {
         if (!DiscordMC.getClient().isReady()) {
@@ -62,11 +62,11 @@ public class MessageAPI {
             try {
                 new MessageBuilder(DiscordMC.getClient()).appendContent(message).withChannel(channel).build();
             } catch (DiscordException e) {
-                e.printStackTrace();
+                plugin.getLogger().severe("Discord threw an exception while sending the message. " + e.getErrorMessage());
             } catch (HTTP429Exception ignored) {
             } catch (MissingPermissionsException e) {
-                e.printStackTrace();
-                plugin.getLogger().severe("Your Bot is missing required permission to perform this action!");
+                plugin.getLogger().severe("Your Bot is missing required permission to perform this action! "
+                        + e.getErrorMessage());
             }
         });
     }

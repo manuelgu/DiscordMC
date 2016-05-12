@@ -37,8 +37,9 @@ public class DiscordCommand implements CommandExecutor {
                     break;
                 }
                 try {
+                    cs.sendMessage(ChatColor.GREEN + "Logging out..");
                     DiscordMC.getClient().logout();
-                    cs.sendMessage(ChatColor.GREEN + "Successfully logged off the Discord Bot");
+                    cs.sendMessage(ChatColor.GREEN + "Done.");
                 } catch (DiscordException | HTTP429Exception e) {
                     cs.sendMessage(ChatColor.RED + "Error while logging off the bot. See console.");
                     e.printStackTrace();
@@ -55,8 +56,9 @@ public class DiscordCommand implements CommandExecutor {
                     break;
                 }
                 try {
+                    cs.sendMessage(ChatColor.GREEN + "Logging in..");
                     DiscordMC.getClient().login();
-                    cs.sendMessage(ChatColor.GREEN + "Successfully logged in the Discord Bot");
+                    cs.sendMessage(ChatColor.GREEN + "Done.");
                 } catch (DiscordException e) {
                     cs.sendMessage(ChatColor.RED + "Error while logging in the bot. See console.");
                     e.printStackTrace();
