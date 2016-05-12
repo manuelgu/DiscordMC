@@ -17,12 +17,9 @@ import sx.blah.discord.util.HTTP429Exception;
 
 public class DiscordCommand implements CommandExecutor {
     private final String USAGE = "Usage: /discord <logout|login|lookup>";
+    private final String LACKING_PERMISSION = "You are lacking the required permission to execute this command";
 
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
-		if (!cs.hasPermission("discordmc.command")) {
-			cs.sendMessage(ChatColor.RED + "You are lacking the required permission to execute this command");
-			return true;
-		}
 		if (!(args.length > 0)) {
             cs.sendMessage(ChatColor.RED + USAGE);
             return true;
@@ -31,6 +28,10 @@ public class DiscordCommand implements CommandExecutor {
             // Log off the client from Discord
             case "logout":
             case "logoff":
+                if (!cs.hasPermission("discordmc.command.logout")) {
+                    cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
+                    break;
+                }
                 if (!DiscordMC.getClient().isReady()) {
                     cs.sendMessage(ChatColor.RED + "Your bot is already disconnected");
                     break;
@@ -45,6 +46,10 @@ public class DiscordCommand implements CommandExecutor {
                 break;
             // Log in the client to Discord
             case "login":
+                if (!cs.hasPermission("discordmc.command.login")) {
+                    cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
+                    break;
+                }
                 if (DiscordMC.getClient().isReady()) {
                     cs.sendMessage(ChatColor.RED + "Your bot is already connected");
                     break;
@@ -58,6 +63,10 @@ public class DiscordCommand implements CommandExecutor {
                 }
                 break;
             case "lookup":
+                if (!cs.hasPermission("discordmc.command.lookup")) {
+                    cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
+                    break;
+                }
                 if (args.length != 2) {
                     cs.sendMessage(ChatColor.RED + "Usage: /discord lookup <user>");
                     break;

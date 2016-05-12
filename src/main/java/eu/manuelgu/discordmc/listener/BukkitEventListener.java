@@ -20,7 +20,6 @@ public class BukkitEventListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncPlayerChatEvent event) {
-        plugin.getLogger().info(event.getEventName() + " fired");
 		if (event.isCancelled()) {
             return;
 		}
@@ -46,6 +45,9 @@ public class BukkitEventListener implements Listener {
 		if (!plugin.getConfig().getBoolean("settings.send_game_login")) {
 			return;
 		}
+        if (!event.getPlayer().hasPermission("discordmc.chat")) {
+            return;
+        }
 		
 		final String username = event.getPlayer().getName();
 		final String formattedMessage = plugin.getConfig().getString("settings.templates.player_join_minecraft")
@@ -59,6 +61,10 @@ public class BukkitEventListener implements Listener {
 		if (!plugin.getConfig().getBoolean("settings.send_game_logout")) {
 			return;
 		}
+        if (!event.getPlayer().hasPermission("discordmc.chat")) {
+            return;
+        }
+
 		final String username = event.getPlayer().getName();
 		final String formattedMessage = plugin.getConfig().getString("settings.templates.player_leave_minecraft")
                 .replaceAll("%u", username);
@@ -71,6 +77,10 @@ public class BukkitEventListener implements Listener {
         if (!plugin.getConfig().getBoolean("settings.send_death_message")) {
             return;
         }
+        if (!event.getEntity().hasPermission("discordmc.chat")) {
+            return;
+        }
+
         final String deathMessage = event.getDeathMessage();
 
         MessageAPI.sendToDiscord(deathMessage);
