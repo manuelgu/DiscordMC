@@ -2,6 +2,7 @@ package eu.manuelgu.discordmc;
 
 import eu.manuelgu.discordmc.listener.BukkitEventListener;
 import eu.manuelgu.discordmc.listener.DiscordEventListener;
+import eu.manuelgu.discordmc.update.Updater;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,6 +50,11 @@ public class DiscordMC extends JavaPlugin {
         // Register bukkit listeners and commands
 		getServer().getPluginManager().registerEvents(new BukkitEventListener(this), this);
 		getCommand("discord").setExecutor(new DiscordCommand());
+
+        // Check plugin updates
+        if (getConfig().getBoolean("settings.check_for_updates")) {
+            Updater.sendUpdateMessage(this);
+        }
 
     }
 

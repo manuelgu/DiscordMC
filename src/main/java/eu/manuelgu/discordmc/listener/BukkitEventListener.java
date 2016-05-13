@@ -2,6 +2,7 @@ package eu.manuelgu.discordmc.listener;
 
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
+import eu.manuelgu.discordmc.update.Updater;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -81,5 +82,16 @@ public class BukkitEventListener implements Listener {
         final String deathMessage = event.getDeathMessage();
 
         MessageAPI.sendToDiscord(deathMessage);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onJoin(PlayerJoinEvent event) {
+        if (!plugin.getConfig().getBoolean("settings.check_for_updates")) {
+            return;
+        }
+        if (!event.getPlayer().hasPermission("discordmc.admin")) {
+            return;
+        }
+        Updater.sendUpdateMessage(event.getPlayer().getUniqueId(), plugin);
     }
 }

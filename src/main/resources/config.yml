@@ -12,6 +12,7 @@ settings:
   send_game_chat: true
   send_discord_chat: true
   send_death_message: true
+  check_for_updates: true
   templates:
     chat_message_discord: '**%u**: %m'
     player_join_minecraft: '%u joined the game'
