@@ -1,12 +1,10 @@
 # DiscordMC by manuelgu
 # https://manuelgu.eu
-#
 # https://www.spigotmc.org/resources/17067/
 settings:
   token: 'TOKEN_HERE'
-  channel: 'channelNameHere'
-  enable_discord_commands: true
-  command_prefix: '?'
+  #enable_discord_commands: true
+  #command_prefix: '?'
   send_game_login: true
   send_game_logout: true
   send_game_chat: true
@@ -18,3 +16,13 @@ settings:
     player_join_minecraft: '%u joined the game'
     player_leave_minecraft: '%u left the game'
     chat_message_minecraft: '<&b(discord) &r%u> %m'
+  channels:
+    # Channels below will receive messages from Minecraft
+    minecraft_to_discord:
+      - 'blah'
+    # Channels below will send messages to Minecraft
+    discord_to_minecraft:
+      - 'blah'
+  discord_commands:
+    enabled: true
+    command_prefix: '?'
