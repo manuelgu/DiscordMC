@@ -1,10 +1,8 @@
 package eu.manuelgu.discordmc;
 
 import com.vdurmont.emoji.EmojiParser;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
@@ -13,7 +11,6 @@ import sx.blah.discord.util.MissingPermissionsException;
 
 public class MessageAPI {
     private static DiscordMC plugin;
-    private static IChannel channel;
 
     public MessageAPI(DiscordMC main) {
         MessageAPI.plugin = main;
@@ -22,13 +19,15 @@ public class MessageAPI {
     /**
      * Send a chat message to the Minecraft server
      *
+     * @param origin {@link IChannel} the message came from
      * @param username player who sent the message
      * @param message  the actual message which gets sent
      */
-    public static void sendToMinecraft(String username, String message) {
+    public static void sendToMinecraft(IChannel origin, String username, String message) {
         String formattedMessage = DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
                 .replaceAll("%u", username)
-                .replaceAll("%m", message);
+                .replaceAll("%m", message)
+                .replaceAll("%c", origin.getName());
 
         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', EmojiParser.parseToAliases(formattedMessage)));
     }
@@ -52,21 +51,17 @@ public class MessageAPI {
             return;
         }
         Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            channel = DiscordMC.getChannel();
 
-            if (channel == null) {
-                plugin.getLogger().severe("Could not send message, channel was null");
-                return;
-            }
-
-            try {
-                new MessageBuilder(DiscordMC.getClient()).appendContent(message).withChannel(channel).build();
-            } catch (DiscordException e) {
-                plugin.getLogger().severe("Discord threw an exception while sending the message. " + e.getErrorMessage());
-            } catch (HTTP429Exception ignored) {
-            } catch (MissingPermissionsException e) {
-                plugin.getLogger().severe("Your Bot is missing required permission to perform this action! "
-                        + e.getErrorMessage());
+            for (IChannel channel : DiscordMC.minecraftToDiscord) {
+                try {
+                    new MessageBuilder(DiscordMC.getClient()).appendContent(message).withChannel(channel).build();
+                } catch (DiscordException e) {
+                    plugin.getLogger().severe("Discord threw an exception while sending the message. " + e.getErrorMessage());
+                } catch (HTTP429Exception ignored) {
+                } catch (MissingPermissionsException e) {
+                    plugin.getLogger().severe("Your Bot is missing required permission to perform this action! "
+                            + e.getErrorMessage());
+                }
             }
         });
     }

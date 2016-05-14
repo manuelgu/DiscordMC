@@ -3,9 +3,9 @@ package eu.manuelgu.discordmc;
 import eu.manuelgu.discordmc.listener.BukkitEventListener;
 import eu.manuelgu.discordmc.listener.DiscordEventListener;
 import eu.manuelgu.discordmc.update.Updater;
-
 import org.bukkit.plugin.java.JavaPlugin;
-
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.EventSubscriber;
@@ -17,17 +17,28 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 
 public class DiscordMC extends JavaPlugin {
+    public static DiscordMC instance;
     @Getter
-	public static IDiscordClient client;
-    @Getter
-    public static IChannel channel;
-	public static DiscordMC instance;
+    public static IDiscordClient client;
 
-	@Override
-	public void onEnable() {
-		instance = this;
-		getConfig().options().copyDefaults(true);
-		saveConfig();
+    /**
+     * Channels that send messages to minecraft
+     */
+    @Getter
+    public static List<IChannel> discordToMinecraft;
+
+    /**
+     * Channels that receive messages from minecraft
+     */
+    @Getter
+    public static List<IChannel> minecraftToDiscord;
+
+
+    @Override
+    public void onEnable() {
+        instance = this;
+        getConfig().options().copyDefaults(true);
+        saveConfig();
 
         // Disable all modules
         Configuration.LOAD_EXTERNAL_MODULES = false;
@@ -48,8 +59,8 @@ public class DiscordMC extends JavaPlugin {
         client.getDispatcher().registerListener(this);
 
         // Register bukkit listeners and commands
-		getServer().getPluginManager().registerEvents(new BukkitEventListener(this), this);
-		getCommand("discord").setExecutor(new DiscordCommand());
+        getServer().getPluginManager().registerEvents(new BukkitEventListener(this), this);
+        getCommand("discord").setExecutor(new DiscordCommand());
 
         // Check plugin updates
         if (getConfig().getBoolean("settings.check_for_updates")) {
@@ -63,10 +74,20 @@ public class DiscordMC extends JavaPlugin {
         if (event.getGuild() == null) {
             return;
         }
-        channel = null;
-        final String channelName = getConfig().getString("settings.channel");
+        discordToMinecraft = new ArrayList<>();
+        minecraftToDiscord = new ArrayList<>();
 
-        getClient().getChannels(false).stream().filter(c -> c.getName().equalsIgnoreCase(channelName)).forEach(c -> channel = c);
+        List<String> dTm = getConfig().getStringList("settings.channels.discord_to_minecraft");
+        List<String> mTd = getConfig().getStringList("settings.channels.minecraft_to_discord");
+
+        for (IChannel channel : getClient().getChannels(false)) {
+            if (dTm.contains(channel.getName())) {
+                discordToMinecraft.add(channel);
+            }
+            if (mTd.contains(channel.getName())) {
+                minecraftToDiscord.add(channel);
+            }
+        }
     }
 
     @Override
@@ -80,9 +101,10 @@ public class DiscordMC extends JavaPlugin {
 
     /**
      * Get instance of DiscordMC main class
+     *
      * @return instance of main class
      */
     public static DiscordMC get() {
-		return instance;
-	}
+        return instance;
+    }
 }

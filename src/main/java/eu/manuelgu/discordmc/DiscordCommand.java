@@ -5,10 +5,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
 import java.util.List;
 import java.util.Optional;
-
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Presences;
@@ -20,7 +18,7 @@ public class DiscordCommand implements CommandExecutor {
     private final String LACKING_PERMISSION = "You are lacking the required permission to execute this command";
 
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
-		if (!(args.length > 0)) {
+        if (!(args.length > 0)) {
             cs.sendMessage(ChatColor.RED + USAGE);
             return true;
         }
@@ -98,10 +96,16 @@ public class DiscordCommand implements CommandExecutor {
                 cs.sendMessage(ChatColor.BLUE + "> Is Bot: " + ChatColor.AQUA + StringUtils.capitalize(String.valueOf(isBot)));
                 cs.sendMessage(ChatColor.BLUE + "> Discriminator: " + ChatColor.AQUA + "#" + discriminator);
                 break;
+            case "debug":
+                if (!cs.hasPermission("discordmc.admin")) {
+                    cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
+                    break;
+                }
+                // TODO collect and print useful debug information
             default:
                 cs.sendMessage(ChatColor.RED + USAGE);
                 break;
         }
-		return true;
-	}
+        return true;
+    }
 }

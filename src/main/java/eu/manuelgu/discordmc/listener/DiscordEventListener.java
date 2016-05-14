@@ -2,11 +2,9 @@ package eu.manuelgu.discordmc.listener;
 
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
-
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -14,11 +12,11 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.DiscordException;
 
@@ -38,7 +36,8 @@ public class DiscordEventListener {
     @EventSubscriber
     public void userChat(final MessageReceivedEvent event) {
         final String channelName = event.getMessage().getChannel().getName();
-        if (!channelName.equalsIgnoreCase(plugin.getConfig().getString("settings.channel"))) {
+        List<String> names = DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList());
+        if (!names.contains(channelName)) {
             return;
         }
 
@@ -83,7 +82,7 @@ public class DiscordEventListener {
                     i++;
                 }
 
-                MessageAPI.sendToMinecraft(event.getMessage().getAuthor().getName(), StringUtils.join(Arrays.asList(trimmedContent), " "));
+                MessageAPI.sendToMinecraft(event.getMessage().getChannel(), event.getMessage().getAuthor().getName(), StringUtils.join(Arrays.asList(trimmedContent), " "));
             }
         }
     }

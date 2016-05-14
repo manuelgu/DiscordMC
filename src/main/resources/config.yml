@@ -3,8 +3,6 @@
 # https://www.spigotmc.org/resources/17067/
 settings:
   token: 'TOKEN_HERE'
-  #enable_discord_commands: true
-  #command_prefix: '?'
   send_game_login: true
   send_game_logout: true
   send_game_chat: true
@@ -15,7 +13,7 @@ settings:
     chat_message_discord: '**%u**: %m'
     player_join_minecraft: '%u joined the game'
     player_leave_minecraft: '%u left the game'
-    chat_message_minecraft: '<&b(discord) &r%u> %m'
+    chat_message_minecraft: '<&b(discord [%c]) &r%u> %m'
   channels:
     # Channels below will receive messages from Minecraft
     minecraft_to_discord:
