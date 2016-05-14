@@ -112,7 +112,7 @@ public class DiscordCommand implements CommandExecutor {
                 StringBuilder b = new StringBuilder();
                 // General
                 b.append("# Some general stuff\n");
-                b.append("version.server: ").append(Bukkit.getVersion() + " (" + Bukkit.getBukkitVersion() + ")").append('\n');
+                b.append("version.server: ").append(Bukkit.getVersion()).append(" (").append(Bukkit.getBukkitVersion()).append(")").append('\n');
                 b.append("plugins:");
                 for (Plugin plugin : DiscordMC.get().getServer().getPluginManager().getPlugins()) {
                     String plEnabled = plugin.isEnabled() ? "true" : "false";
