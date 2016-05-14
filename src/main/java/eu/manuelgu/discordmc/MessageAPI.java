@@ -50,6 +50,9 @@ public class MessageAPI {
         if (!DiscordMC.getClient().isReady()) {
             return;
         }
+        if (DiscordMC.getClient().getGuilds().isEmpty()) {
+            return;
+        }
         Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
 
             for (IChannel channel : DiscordMC.minecraftToDiscord) {
