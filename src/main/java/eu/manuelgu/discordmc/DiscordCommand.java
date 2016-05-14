@@ -20,7 +20,7 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.HTTP429Exception;
 
 public class DiscordCommand implements CommandExecutor {
-    private final String USAGE = "Usage: /discord <logout|login|lookup>";
+    private final String USAGE = "Usage: /discord <logout|login|lookup|send|debug>";
     private final String LACKING_PERMISSION = "You are lacking the required permission to execute this command";
 
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
@@ -109,51 +109,92 @@ public class DiscordCommand implements CommandExecutor {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
                     break;
                 }
-                StringBuilder b = new StringBuilder();
-                // General
-                b.append("# Some general stuff\n");
-                b.append("version.server: ").append(Bukkit.getVersion()).append(" (").append(Bukkit.getBukkitVersion()).append(")").append('\n');
-                b.append("plugins:");
-                for (Plugin plugin : DiscordMC.get().getServer().getPluginManager().getPlugins()) {
-                    String plEnabled = plugin.isEnabled() ? "true" : "false";
-                    String plName = plugin.getName();
-                    String plVersion = plugin.getDescription().getVersion();
-                    b.append("\n  ").append(plName).append(":\n    ").append("version: '").append(plVersion).append('\'').append("\n    enabled: ")
-                            .append(plEnabled);
-                }
-
-                // JVM
-                b.append("\n# Now some jvm related information\n");
-                Runtime runtime = Runtime.getRuntime();
-                b.append("memory.free: ").append(runtime.freeMemory()).append('\n');
-                b.append("memory.max: ").append(runtime.maxMemory()).append('\n');
-                b.append("java.specification.version: '").append(System.getProperty("java.specification.version")).append("'\n");
-                b.append("java.vendor: '").append(System.getProperty("java.vendor")).append("'\n");
-                b.append("java.version: '").append(System.getProperty("java.version")).append("'\n");
-                b.append("os.arch: '").append(System.getProperty("os.arch")).append("'\n");
-                b.append("os.name: '").append(System.getProperty("os.name")).append("'\n");
-                b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
-
-                // DiscordMC
-                b.append("\n\n# DiscordMC related stuff\n");
-                b.append("isReady: ").append(String.valueOf(DiscordMC.getClient().isReady())).append('\n');
-                b.append("botName: ").append(DiscordMC.getClient().getOurUser().getName()).append('\n');
-                b.append("channels.minecraftToDiscord: ").append(StringUtils.join(
-                        DiscordMC.minecraftToDiscord.stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
-                b.append("channels.discordToMinecraft: ").append(StringUtils.join(
-                        DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
-
+                String debugInfo = getDebugInfo();
                 try {
-                    cs.sendMessage(ChatColor.GOLD + HastebinUtility.upload(b.toString()));
+                    cs.sendMessage(ChatColor.GOLD + HastebinUtility.upload(debugInfo));
                 } catch (IOException e) {
                     cs.sendMessage(ChatColor.RED + "Unable to upload data.. Copy & paste console output");
-                    System.out.println(b.toString());
+                    System.out.println(debugInfo);
                 }
+                break;
+            case "send":
+                if (!cs.hasPermission("discordmc.command.send")) {
+                    cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
+                    break;
+                }
+                if (args.length < 3) {
+                    cs.sendMessage(ChatColor.RED + "Usage: /discord send <channel> <message>");
+                    break;
+                }
+                // TODO make the below implementation prettier
+
+                String channel = args[1];
+                String message = "";
+                // Starting from second argument
+                for (int i = 2; i < args.length; i++) {
+                    message += args[i] + " ";
+                }
+                String finalMessage = message;
+                IChannel ch = null;
+                for (IChannel c : DiscordMC.getClient().getChannels(false)) {
+                    if (c.getName().equalsIgnoreCase(channel)) {
+                        ch = c;
+                    }
+                }
+
+                if (ch == null) {
+                    cs.sendMessage(ChatColor.RED + "Channel not found");
+                    break;
+                }
+                MessageAPI.sendToDiscord(ch, finalMessage);
+                cs.sendMessage(ChatColor.GREEN + "Message sent");
                 break;
             default:
                 cs.sendMessage(ChatColor.RED + USAGE);
                 break;
         }
         return true;
+    }
+
+    /**
+     * Get debug information about current setup
+     * @return debug info in one long string with line breaks
+     */
+    private String getDebugInfo() {
+        StringBuilder b = new StringBuilder();
+        // General
+        b.append("# Some general stuff\n");
+        b.append("version.server: ").append(Bukkit.getVersion()).append(" (").append(Bukkit.getBukkitVersion()).append(")").append('\n');
+        b.append("plugins:");
+        for (Plugin plugin : DiscordMC.get().getServer().getPluginManager().getPlugins()) {
+            String plEnabled = plugin.isEnabled() ? "true" : "false";
+            String plName = plugin.getName();
+            String plVersion = plugin.getDescription().getVersion();
+            b.append("\n  ").append(plName).append(":\n    ").append("version: '").append(plVersion).append('\'').append("\n    enabled: ")
+                    .append(plEnabled);
+        }
+
+        // JVM
+        b.append("\n# Now some jvm related information\n");
+        Runtime runtime = Runtime.getRuntime();
+        b.append("memory.free: ").append(runtime.freeMemory()).append('\n');
+        b.append("memory.max: ").append(runtime.maxMemory()).append('\n');
+        b.append("java.specification.version: '").append(System.getProperty("java.specification.version")).append("'\n");
+        b.append("java.vendor: '").append(System.getProperty("java.vendor")).append("'\n");
+        b.append("java.version: '").append(System.getProperty("java.version")).append("'\n");
+        b.append("os.arch: '").append(System.getProperty("os.arch")).append("'\n");
+        b.append("os.name: '").append(System.getProperty("os.name")).append("'\n");
+        b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
+
+        // DiscordMC
+        b.append("\n\n# DiscordMC related stuff\n");
+        b.append("isReady: ").append(String.valueOf(DiscordMC.getClient().isReady())).append('\n');
+        b.append("botName: ").append(DiscordMC.getClient().getOurUser().getName()).append('\n');
+        b.append("channels.minecraftToDiscord: ").append(StringUtils.join(
+                DiscordMC.minecraftToDiscord.stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
+        b.append("channels.discordToMinecraft: ").append(StringUtils.join(
+                DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
+
+        return b.toString();
     }
 }

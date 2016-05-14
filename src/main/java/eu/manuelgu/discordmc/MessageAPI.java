@@ -68,4 +68,21 @@ public class MessageAPI {
             }
         });
     }
+
+    /**
+     * Send a message to a specific channel
+     * @param channel channel to receive message
+     * @param message message to send
+     */
+    public static void sendToDiscord(IChannel channel, String message) {
+        try {
+            new MessageBuilder(DiscordMC.getClient()).appendContent(message).withChannel(channel).build();
+        } catch (DiscordException e) {
+            plugin.getLogger().severe("Discord threw an exception while sending the message. " + e.getErrorMessage());
+        } catch (HTTP429Exception ignored) {
+        } catch (MissingPermissionsException e) {
+            plugin.getLogger().severe("Your Bot is missing required permission to perform this action! "
+                    + e.getErrorMessage());
+        }
+    }
 }
