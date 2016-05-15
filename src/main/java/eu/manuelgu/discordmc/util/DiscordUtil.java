@@ -8,7 +8,7 @@ import sx.blah.discord.handle.obj.IChannel;
 public class DiscordUtil {
 
     /**
-     * Get a channel by its name
+     * Get a list of channels by matching a name
      *
      * @param name name of the channel
      * @return channel matching name
