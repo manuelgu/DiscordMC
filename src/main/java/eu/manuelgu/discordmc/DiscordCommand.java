@@ -1,5 +1,6 @@
 package eu.manuelgu.discordmc;
 
+import eu.manuelgu.discordmc.util.DiscordUtil;
 import eu.manuelgu.discordmc.util.HastebinUtility;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -126,7 +127,6 @@ public class DiscordCommand implements CommandExecutor {
                     cs.sendMessage(ChatColor.RED + "Usage: /discord send <channel> <message>");
                     break;
                 }
-                // TODO make the below implementation prettier
 
                 String channel = args[1];
                 String message = "";
@@ -135,12 +135,7 @@ public class DiscordCommand implements CommandExecutor {
                     message += args[i] + " ";
                 }
                 String finalMessage = message;
-                IChannel ch = null;
-                for (IChannel c : DiscordMC.getClient().getChannels(false)) {
-                    if (c.getName().equalsIgnoreCase(channel)) {
-                        ch = c;
-                    }
-                }
+                List<IChannel> ch = DiscordUtil.getChannelMatchingName(channel);
 
                 if (ch == null) {
                     cs.sendMessage(ChatColor.RED + "Channel not found");
