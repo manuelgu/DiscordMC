@@ -26,7 +26,7 @@ public class MessageAPI {
     public static void sendToMinecraft(IChannel origin, String username, String message) {
         String formattedMessage = DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
                 .replaceAll("%u", username)
-                .replaceAll("%m", message)
+                .replaceAll("%m", ChatColor.stripColor(message))
                 .replaceAll("%c", origin.getName());
 
         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', EmojiParser.parseToAliases(formattedMessage)));
