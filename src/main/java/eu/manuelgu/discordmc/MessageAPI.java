@@ -3,11 +3,12 @@ package eu.manuelgu.discordmc;
 import com.vdurmont.emoji.EmojiParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import java.util.List;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
 import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.RequestBuffer;
 
 public class MessageAPI {
     private static DiscordMC plugin;
@@ -54,17 +55,8 @@ public class MessageAPI {
             return;
         }
         Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-
             for (IChannel channel : DiscordMC.minecraftToDiscord) {
-                try {
-                    new MessageBuilder(DiscordMC.getClient()).appendContent(message).withChannel(channel).build();
-                } catch (DiscordException e) {
-                    plugin.getLogger().severe("Discord threw an exception while sending the message. " + e.getErrorMessage());
-                } catch (HTTP429Exception ignored) {
-                } catch (MissingPermissionsException e) {
-                    plugin.getLogger().severe("Your Bot is missing required permission to perform this action! "
-                            + e.getErrorMessage());
-                }
+                sendToDiscord(channel, message);
             }
         });
     }
@@ -75,14 +67,26 @@ public class MessageAPI {
      * @param message message to send
      */
     public static void sendToDiscord(IChannel channel, String message) {
-        try {
-            new MessageBuilder(DiscordMC.getClient()).appendContent(message).withChannel(channel).build();
-        } catch (DiscordException e) {
-            plugin.getLogger().severe("Discord threw an exception while sending the message. " + e.getErrorMessage());
-        } catch (HTTP429Exception ignored) {
-        } catch (MissingPermissionsException e) {
-            plugin.getLogger().severe("Your Bot is missing required permission to perform this action! "
+        RequestBuffer.request(() -> {
+            try {
+                new MessageBuilder(DiscordMC.getClient()).appendContent(message).withChannel(channel).build();
+            } catch (DiscordException ignored) {
+            } catch (MissingPermissionsException e) {
+                plugin.getLogger().severe("Your Bot is missing required permissions to perform this action! "
                     + e.getErrorMessage());
+            }
+            return null;
+        });
+    }
+
+    /**
+     * Send a message to a list of specific channels
+     * @param channels channels that receive message
+     * @param message message to send
+     */
+    public static void sendToDiscord(List<IChannel> channels, String message) {
+        for (IChannel channel : channels) {
+            sendToDiscord(channel, message);
         }
     }
 }
