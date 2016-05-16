@@ -46,9 +46,18 @@ public class DiscordMC extends JavaPlugin {
 
         new MessageAPI(this);
 
+        String token = getConfig().getString("settings.token");
+
+        // Token not entered, probably initial start
+        if (token.equalsIgnoreCase("TOKEN_HERE") || token.equalsIgnoreCase("")) {
+            getLogger().warning("You haven't entered a valid token for your bot. See Spigot page for a tutorial.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         // Client builder and login
         try {
-            client = new ClientBuilder().withToken(getConfig().getString("settings.token")).login();
+            client = new ClientBuilder().withToken(token).login();
         } catch (DiscordException e) {
             e.printStackTrace();
             getLogger().severe("Failed to login");
@@ -92,9 +101,12 @@ public class DiscordMC extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (!DiscordMC.getClient().isReady()) {
+            return;
+        }
         try {
             client.logout();
-        } catch (DiscordException | HTTP429Exception e) {
+        } catch (DiscordException | HTTP429Exception ignored) {
             getLogger().severe("Failed to logout");
         }
     }
