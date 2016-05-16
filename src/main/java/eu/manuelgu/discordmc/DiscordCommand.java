@@ -17,8 +17,6 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Presences;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
 
 public class DiscordCommand implements CommandExecutor {
     private final String USAGE = "Usage: /discord <logout|login|lookup|send|debug>";
@@ -41,13 +39,11 @@ public class DiscordCommand implements CommandExecutor {
                     cs.sendMessage(ChatColor.RED + "Your bot is already disconnected");
                     break;
                 }
-                try {
-                    cs.sendMessage(ChatColor.GREEN + "Logging out..");
-                    DiscordMC.getClient().logout();
-                    cs.sendMessage(ChatColor.GREEN + "Done.");
-                } catch (DiscordException | HTTP429Exception e) {
+                cs.sendMessage(ChatColor.GREEN + "Logging out..");
+                if (!DiscordUtil.logout(DiscordMC.getClient())) {
                     cs.sendMessage(ChatColor.RED + "Error while logging off the bot. See console.");
-                    e.printStackTrace();
+                } else {
+                    cs.sendMessage(ChatColor.GREEN + "Done.");
                 }
                 break;
             // Log in the client to Discord
@@ -60,13 +56,11 @@ public class DiscordCommand implements CommandExecutor {
                     cs.sendMessage(ChatColor.RED + "Your bot is already connected");
                     break;
                 }
-                try {
-                    cs.sendMessage(ChatColor.GREEN + "Logging in..");
-                    DiscordMC.getClient().login();
-                    cs.sendMessage(ChatColor.GREEN + "Done.");
-                } catch (DiscordException e) {
+                cs.sendMessage(ChatColor.GREEN + "Logging in..");
+                if (!DiscordUtil.login(DiscordMC.getClient())) {
                     cs.sendMessage(ChatColor.RED + "Error while logging in the bot. See console.");
-                    e.printStackTrace();
+                } else {
+                    cs.sendMessage(ChatColor.GREEN + "Done.");
                 }
                 break;
             case "lookup":
@@ -115,7 +109,7 @@ public class DiscordCommand implements CommandExecutor {
                     cs.sendMessage(ChatColor.GOLD + HastebinUtility.upload(debugInfo));
                 } catch (IOException e) {
                     cs.sendMessage(ChatColor.RED + "Unable to upload data.. Copy & paste console output");
-                    System.out.println(debugInfo);
+                    DiscordMC.get().getLogger().info(debugInfo);
                 }
                 break;
             case "send":
