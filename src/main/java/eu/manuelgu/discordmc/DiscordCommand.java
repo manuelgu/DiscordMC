@@ -104,6 +104,15 @@ public class DiscordCommand implements CommandExecutor {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
                     break;
                 }
+                if (args.length == 3) {
+                    String channelName = args[2];
+                    if (args[1].equalsIgnoreCase("sendtest")) {
+                        for (IChannel cha : DiscordUtil.getChannelMatchingName(channelName)) {
+                            MessageAPI.sendToDiscord(cha, "This is a test payload!");
+                        }
+                        break;
+                    }
+                }
                 String debugInfo = getDebugInfo();
                 try {
                     cs.sendMessage(ChatColor.GOLD + HastebinUtility.upload(debugInfo));

@@ -9,4 +9,5 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - Strip color codes from chat messages sent to discord
 - Always send messages and queue them if getting 429's
 - /discord reload
+- /discord debug sendtest <channel>, sends a test payload
 - no way too long stracktrace on first startup anymore
