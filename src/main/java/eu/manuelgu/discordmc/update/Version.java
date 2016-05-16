@@ -32,7 +32,6 @@ public class Version implements Comparable<Version> {
             if (partA < partB) return -1;
             if (partA > partB) return 1;
         }
-
         return 0;
     }
 
