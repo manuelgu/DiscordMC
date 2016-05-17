@@ -82,6 +82,7 @@ public class DiscordEventListener {
                     i++;
                 }
 
+                //                                                                                        #getDisplayname for 2.5 to support nicknames
                 MessageAPI.sendToMinecraft(event.getMessage().getChannel(), event.getMessage().getAuthor().getName(), StringUtils.join(Arrays.asList(trimmedContent), " "));
             }
         }
@@ -121,7 +122,6 @@ public class DiscordEventListener {
     @EventSubscriber
     public void onReady(final ReadyEvent event) {
         plugin.getLogger().info("Successfully logged in with '" + event.getClient().getOurUser().getName() + "'");
-
         // Check for file encoder (emoji-related)
         switch (System.getProperty("file.encoding")) {
             case "UTF8":

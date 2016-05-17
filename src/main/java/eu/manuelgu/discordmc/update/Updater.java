@@ -51,6 +51,7 @@ public class Updater {
     }
 
     public static void sendUpdateMessage(final Plugin plugin) {
+        // No update notification for snapshot releases
         if (DiscordMC.get().getDescription().getVersion().endsWith("-SNAPSHOT")) {
             return;
         }
