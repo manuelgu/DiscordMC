@@ -25,12 +25,12 @@ public class MessageAPI {
      * @param message  the actual message which gets sent
      */
     public static void sendToMinecraft(IChannel origin, String username, String message) {
-        String formattedMessage = DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
+        String formattedMessage = ChatColor.translateAlternateColorCodes('&', DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
                 .replaceAll("%u", username)
-                .replaceAll("%m", ChatColor.stripColor(message))
-                .replaceAll("%c", origin.getName());
+                .replaceAll("%c", origin.getName()));
 
-        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', EmojiParser.parseToAliases(formattedMessage)));
+        Bukkit.broadcastMessage(EmojiParser.parseToAliases(formattedMessage
+                .replaceAll("%m", ChatColor.stripColor(message))));
     }
 
     /**

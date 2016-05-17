@@ -11,3 +11,4 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - /discord reload
 - /discord debug sendtest <channel>, sends a test payload
 - No way too long stracktrace on first startup anymore
+- Color codes from Discord will no longer make the message colored
