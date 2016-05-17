@@ -18,6 +18,10 @@ import sx.blah.discord.util.HTTP429Exception;
 
 public class DiscordMC extends JavaPlugin {
     public static DiscordMC instance;
+
+    /**
+     * Get the client instance
+     */
     @Getter
     public static IDiscordClient client;
 
@@ -34,6 +38,14 @@ public class DiscordMC extends JavaPlugin {
     public static List<IChannel> minecraftToDiscord;
     private static boolean validToken;
 
+    /**
+     * Get instance of DiscordMC main class
+     *
+     * @return instance of main class
+     */
+    public static DiscordMC get() {
+        return instance;
+    }
 
     @Override
     public void onEnable() {
@@ -117,14 +129,5 @@ public class DiscordMC extends JavaPlugin {
         } catch (DiscordException | HTTP429Exception ignored) {
             getLogger().severe("Failed to logout");
         }
-    }
-
-    /**
-     * Get instance of DiscordMC main class
-     *
-     * @return instance of main class
-     */
-    public static DiscordMC get() {
-        return instance;
     }
 }
