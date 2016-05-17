@@ -32,6 +32,7 @@ public class DiscordMC extends JavaPlugin {
      */
     @Getter
     public static List<IChannel> minecraftToDiscord;
+    private static boolean validToken;
 
 
     @Override
@@ -51,8 +52,11 @@ public class DiscordMC extends JavaPlugin {
         // Token not entered, probably initial start
         if (token.equalsIgnoreCase("TOKEN_HERE") || token.equalsIgnoreCase("")) {
             getLogger().warning("You haven't entered a valid token for your bot. See Spigot page for a tutorial.");
+            validToken = false;
             getServer().getPluginManager().disablePlugin(this);
             return;
+        } else {
+            validToken = true;
         }
 
         // Client builder and login
@@ -78,11 +82,13 @@ public class DiscordMC extends JavaPlugin {
 
     }
 
+    // INFO: GuildCreateEvent gets called AFTER ReadyEvent (as of 2.4.x, will be different in 2.5)
     @EventSubscriber
     public void onGuildCreate(GuildCreateEvent event) {
         if (event.getGuild() == null) {
             return;
         }
+
         discordToMinecraft = new ArrayList<>();
         minecraftToDiscord = new ArrayList<>();
 
@@ -97,11 +103,13 @@ public class DiscordMC extends JavaPlugin {
                 minecraftToDiscord.add(channel);
             }
         }
+
+        getLogger().info("Successfully logged in with '" + event.getClient().getOurUser().getName() + "'");
     }
 
     @Override
     public void onDisable() {
-        if (!DiscordMC.getClient().isReady()) {
+        if (!validToken) {
             return;
         }
         try {

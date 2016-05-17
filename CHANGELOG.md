@@ -10,4 +10,4 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - Always send messages and queue them if getting 429's
 - /discord reload
 - /discord debug sendtest <channel>, sends a test payload
-- no way too long stracktrace on first startup anymore
+- No way too long stracktrace on first startup anymore
