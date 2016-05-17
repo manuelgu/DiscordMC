@@ -55,9 +55,7 @@ public class MessageAPI {
             return;
         }
         Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            for (IChannel channel : DiscordMC.minecraftToDiscord) {
-                sendToDiscord(channel, message);
-            }
+            DiscordMC.minecraftToDiscord.forEach(channel -> sendToDiscord(channel, message));
         });
     }
 
@@ -85,8 +83,6 @@ public class MessageAPI {
      * @param message message to send
      */
     public static void sendToDiscord(List<IChannel> channels, String message) {
-        for (IChannel channel : channels) {
-            sendToDiscord(channel, message);
-        }
+        channels.stream().forEach(channel -> sendToDiscord(channel, message));
     }
 }
