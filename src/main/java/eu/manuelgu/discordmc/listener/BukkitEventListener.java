@@ -3,6 +3,7 @@ package eu.manuelgu.discordmc.listener;
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
 import eu.manuelgu.discordmc.update.Updater;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -23,7 +24,7 @@ public class BukkitEventListener implements Listener {
         if (!plugin.getConfig().getBoolean("settings.send_game_chat")) {
             return;
         }
-        if (!event.getPlayer().hasPermission("discordmc.chat")) {
+        if (!canChat(event.getPlayer())) {
             return;
         }
         final String username = event.getPlayer().getName();
@@ -41,7 +42,7 @@ public class BukkitEventListener implements Listener {
         if (!plugin.getConfig().getBoolean("settings.send_game_login")) {
             return;
         }
-        if (!event.getPlayer().hasPermission("discordmc.chat")) {
+        if (!canChat(event.getPlayer())) {
             return;
         }
         final String username = event.getPlayer().getName();
@@ -56,7 +57,7 @@ public class BukkitEventListener implements Listener {
         if (!plugin.getConfig().getBoolean("settings.send_game_logout")) {
             return;
         }
-        if (!event.getPlayer().hasPermission("discordmc.chat")) {
+        if (!canChat(event.getPlayer())) {
             return;
         }
         final String username = event.getPlayer().getName();
@@ -71,7 +72,7 @@ public class BukkitEventListener implements Listener {
         if (!plugin.getConfig().getBoolean("settings.send_death_message")) {
             return;
         }
-        if (!event.getEntity().hasPermission("discordmc.chat")) {
+        if (!canChat(event.getEntity())) {
             return;
         }
         final String deathMessage = event.getDeathMessage();
@@ -88,5 +89,9 @@ public class BukkitEventListener implements Listener {
             return;
         }
         Updater.sendUpdateMessage(event.getPlayer().getUniqueId(), plugin);
+    }
+
+    private boolean canChat(Player player) {
+        return player.hasPermission("discordmc.chat");
     }
 }
