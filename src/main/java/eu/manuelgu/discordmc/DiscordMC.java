@@ -26,13 +26,13 @@ public class DiscordMC extends JavaPlugin {
     public static IDiscordClient client;
 
     /**
-     * Channels that send messages to minecraft
+     * Channels that send messages to Minecraft
      */
     @Getter
     public static List<IChannel> discordToMinecraft;
 
     /**
-     * Channels that receive messages from minecraft
+     * Channels that receive messages from Minecraft
      */
     @Getter
     public static List<IChannel> minecraftToDiscord;
