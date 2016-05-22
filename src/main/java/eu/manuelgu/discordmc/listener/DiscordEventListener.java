@@ -30,7 +30,7 @@ public class DiscordEventListener {
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
         relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat");
-        commands = plugin.getConfig().getBoolean("settings.enable_discord_commands");
+        commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled");
     }
 
     @EventSubscriber
@@ -41,7 +41,7 @@ public class DiscordEventListener {
             return;
         }
 
-        if (commands && event.getMessage().getContent().startsWith(plugin.getConfig().getString("settings.command_prefix")) && event.getMessage().getContent().length() > 1) {
+        if (commands && event.getMessage().getContent().startsWith(plugin.getConfig().getString("settings.discord_commands.command_prefix")) && event.getMessage().getContent().length() > 1) {
             // Commands enabled and it is a valid command
             switch (event.getMessage().getContent().substring(1)) {
                 case "help":
@@ -95,6 +95,7 @@ public class DiscordEventListener {
             return;
         }
 
+        // Auto reconnect
         try {
             reconnectTimer = new Timer();
             reconnectTimer.schedule(new TimerTask() {
