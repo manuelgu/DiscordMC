@@ -15,6 +15,7 @@ public class DiscordUtil {
      *
      * @param name name of the channel
      * @return channel matching name
+     * @deprecated in 2.5 of D4j
      */
     public static List<IChannel> getChannelMatchingName(String name) {
         return DiscordMC.getClient().getChannels(false).stream()
