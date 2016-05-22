@@ -2,6 +2,7 @@ package eu.manuelgu.discordmc;
 
 import eu.manuelgu.discordmc.util.DiscordUtil;
 import eu.manuelgu.discordmc.util.HastebinUtility;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,11 +10,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Presences;
@@ -170,10 +173,24 @@ public class DiscordCommand implements CommandExecutor {
      * @return debug info in one long string with line breaks
      */
     private String getDebugInfo() {
+        String configFileString = null;
+
+        try {
+            File config = new File(DiscordMC.get().getDataFolder(), "config.yml");
+            List<String> lines = FileUtils.readLines(config);
+            List<String> updatedLines = lines.stream().filter(s -> !s.contains("token")).collect(Collectors.toList());
+            for (String s : updatedLines) {
+                configFileString += s + System.lineSeparator();
+            }
+            configFileString = HastebinUtility.upload(configFileString);
+        } catch (IOException ignored) {
+            configFileString = "Couldn't paste config.";
+        }
+
         StringBuilder b = new StringBuilder();
         // General
         b.append("# Some general stuff\n");
-        b.append("version.server: ").append(Bukkit.getVersion()).append(" (").append(Bukkit.getBukkitVersion()).append(")").append('\n');
+        b.append("versionServer: ").append(Bukkit.getVersion()).append(" (").append(Bukkit.getBukkitVersion()).append(")").append('\n');
         b.append("plugins:");
         for (Plugin plugin : DiscordMC.get().getServer().getPluginManager().getPlugins()) {
             String plEnabled = plugin.isEnabled() ? "true" : "false";
@@ -184,7 +201,7 @@ public class DiscordCommand implements CommandExecutor {
         }
 
         // JVM
-        b.append("\n# Now some jvm related information\n");
+        b.append("\n\n# Now some jvm related information\n");
         Runtime runtime = Runtime.getRuntime();
         b.append("memory.free: ").append(runtime.freeMemory()).append('\n');
         b.append("memory.max: ").append(runtime.maxMemory()).append('\n');
@@ -196,12 +213,19 @@ public class DiscordCommand implements CommandExecutor {
         b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
 
         // DiscordMC
-        b.append("\n\n# DiscordMC related stuff\n");
+        b.append("# DiscordMC related stuff\n");
+        b.append("configFile: ").append(configFileString).append('\n');
         b.append("isReady: ").append(String.valueOf(DiscordMC.getClient().isReady())).append('\n');
-        b.append("botName: ").append(DiscordMC.getClient().getOurUser().getName()).append('\n');
-        b.append("channels.minecraftToDiscord: ").append(StringUtils.join(
+        b.append("guilds:");
+        for (IGuild guild : DiscordMC.getClient().getGuilds()) {
+            String guildName = guild.getName();
+            b.append("\n  ").append("\'" + guildName + "\'");
+        }
+        b.append("\nbotName: ").append(DiscordMC.getClient().getOurUser().getName()).append('\n');
+        b.append("channels:\n");
+        b.append("  minecraftToDiscord: ").append(StringUtils.join(
                 DiscordMC.minecraftToDiscord.stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
-        b.append("channels.discordToMinecraft: ").append(StringUtils.join(
+        b.append("  discordToMinecraft: ").append(StringUtils.join(
                 DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
 
         return b.toString();
