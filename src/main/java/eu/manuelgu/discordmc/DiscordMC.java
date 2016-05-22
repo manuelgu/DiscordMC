@@ -51,7 +51,7 @@ public class DiscordMC extends JavaPlugin {
     public void onEnable() {
         instance = this;
         getConfig().options().copyDefaults(true);
-        saveConfig();
+        saveDefaultConfig();
 
         // Disable all modules
         Configuration.LOAD_EXTERNAL_MODULES = false;

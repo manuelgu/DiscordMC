@@ -1,6 +1,6 @@
-## DiscordMC by manuelgu
-## https://manuelgu.eu
-## https://www.spigotmc.org/resources/17067/
+# DiscordMC by manuelgu
+# https://manuelgu.eu
+# https://www.spigotmc.org/resources/17067/
 settings:
   token: 'TOKEN_HERE'
   send_game_login: true
@@ -9,7 +9,6 @@ settings:
   send_discord_chat: true
   send_death_message: true
   check_for_updates: true
-  use_nicknames: false # TODO implement
   templates:
     chat_message_discord: '**%u**: %m'
     player_join_minecraft: '%u joined the game'
