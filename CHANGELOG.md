@@ -14,3 +14,5 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - Using #saveDefaultConfig, recommended to reset the configuration file due to major changes to the format
 - Sets the Bots game to "Minecraft"
 - Support nicknames for message templates and mentions
+- Performance improvements
+

@@ -29,18 +29,19 @@ public class DiscordEventListener {
     private boolean relayChat;
     private boolean commands;
     private boolean useNickname;
+    private List<String> names;
 
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
         relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat");
         commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled");
         useNickname = plugin.getConfig().getBoolean("settings.use_nicknames");
+        names = DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList());
     }
 
     @EventSubscriber
     public void userChat(final MessageReceivedEvent event) {
         final String channelName = event.getMessage().getChannel().getName();
-        List<String> names = DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList());
         if (!names.contains(channelName)) {
             return;
         }
