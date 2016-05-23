@@ -124,17 +124,6 @@ public class DiscordCommand implements CommandExecutor {
                     DiscordMC.get().getLogger().info(debugInfo);
                 }
                 break;
-            case "reload":
-                if (!cs.hasPermission("discordmc.admin")) {
-                    cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
-                    break;
-                }
-                DiscordUtil.logout(DiscordMC.getClient());
-                DiscordMC.get().reloadConfig();
-                DiscordUtil.login(DiscordMC.getClient());
-
-                cs.sendMessage(ChatColor.GREEN + "Successfully reloaded the configuration file");
-                break;
             case "send":
                 if (!cs.hasPermission("discordmc.command.send")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
