@@ -5,7 +5,7 @@ import eu.manuelgu.discordmc.MessageAPI;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import java.util.Arrays;
+import java.util.Optional;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,7 +17,9 @@ import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Status;
 import sx.blah.discord.util.DiscordException;
 
 public class DiscordEventListener {
@@ -26,11 +28,13 @@ public class DiscordEventListener {
     private Timer reconnectTimer;
     private boolean relayChat;
     private boolean commands;
+    private boolean useNickname;
 
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
         relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat");
         commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled");
+        useNickname = plugin.getConfig().getBoolean("settings.use_nicknames");
     }
 
     @EventSubscriber
@@ -61,29 +65,38 @@ public class DiscordEventListener {
             if (relayChat) {
                 String content = event.getMessage().getContent();
                 List<IUser> mentions = event.getMessage().getMentions();
+                List<IRole> roleMentions = event.getMessage().getRoleMentions();
 
                 for (IUser u : mentions) {
-                    String name = u.getName();
+                    String name = u.getNicknameForGuild(event.getMessage().getGuild()).get();
                     String id = u.getID();
 
+                    // User name
                     content = content.replaceAll("<@" + id + ">", "@" + name);
+                    // Nick name
+                    content = content.replaceAll("<@!" + id + ">", "@" + name);
                 }
 
-                String[] trimmedContent = content.split("\\s+");
-                int i = 0;
-                for (String tmp : trimmedContent) {
-                    if (tmp.startsWith("<@&") && tmp.endsWith(">")) {
-                        // Is role mention
-                        String id = tmp.substring(3, tmp.length() - 1);
-                        String roleName = event.getMessage().getGuild().getRoleByID(id).getName();
+                for (IRole r : roleMentions) {
+                    String roleName = r.getName();
+                    String roleId = r.getID();
 
-                        trimmedContent[i] = "@" + roleName;
+                    content = content.replaceAll("<@&" + roleId + ">", "@" + roleName);
+                }
+
+                String nickname = null;
+                if (useNickname && event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild()).isPresent()) {
+                    Optional<String> nick = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild());
+                    if (nick.isPresent()) {
+                        nickname = nick.get();
                     }
-                    i++;
+                } else {
+                    useNickname = false;
                 }
 
-                //                                                                                        #getDisplayname for 2.5 to support nicknames
-                MessageAPI.sendToMinecraft(event.getMessage().getChannel(), event.getMessage().getAuthor().getName(), StringUtils.join(Arrays.asList(trimmedContent), " "));
+                MessageAPI.sendToMinecraft(event.getMessage().getChannel(),
+                        useNickname ? nickname : event.getMessage().getAuthor().getName(),
+                        content);
             }
         }
     }
