@@ -20,4 +20,4 @@ $ mvn clean install
 ```
 
 ## Contributing
-Have an optimization or a new idea you want to implement? Don't hesitate to open a PR against the `dev` branch
+You have an optimization or a new idea you want to implement? Don't hesitate to open a Pull Request against the `dev` branch
