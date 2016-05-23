@@ -86,7 +86,7 @@ public class DiscordMC extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BukkitEventListener(this), this);
         getCommand("discord").setExecutor(new DiscordCommand());
 
-        // Check plugin updates
+        // Check for plugin updates
         if (getConfig().getBoolean("settings.check_for_updates")) {
             Updater.sendUpdateMessage(this);
         }
