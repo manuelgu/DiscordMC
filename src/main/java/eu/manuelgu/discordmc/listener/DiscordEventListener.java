@@ -113,7 +113,7 @@ public class DiscordEventListener {
                         reconnectTimer.cancel();
                     }
                 }
-            }, (long) 2, RECONNECT_DELAY);
+            }, (long) 2000, RECONNECT_DELAY);
         } catch (Exception e) {
             e.printStackTrace();
             plugin.getLogger().severe("There was a problem with reconnecting.. Please report the above stacktrace to the developer");
