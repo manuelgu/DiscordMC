@@ -110,7 +110,7 @@ public class DiscordCommand implements CommandExecutor {
                 if (args.length == 3) {
                     String channelName = args[2];
                     if (args[1].equalsIgnoreCase("sendtest")) {
-                        for (IChannel cha : DiscordUtil.getChannelMatchingName(channelName)) {
+                        for (IChannel cha : DiscordMC.getClient().getGuilds().get(0).getChannelsByName(channelName)) {
                             MessageAPI.sendToDiscord(cha, "This is a test payload!");
                         }
                         break;
