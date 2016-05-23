@@ -17,7 +17,7 @@ Plugin releases can be found on the [Spigot page](https://www.spigotmc.org/resou
 DiscordMC uses Maven to build
 ```
 $ mvn clean install
-```
+``` 
 
 ## Contributing
 You have an optimization or a new idea you want to implement? Don't hesitate to open a Pull Request against the `dev` branch
