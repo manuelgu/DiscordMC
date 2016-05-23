@@ -113,6 +113,7 @@ public class DiscordCommand implements CommandExecutor {
                         for (IChannel cha : DiscordMC.getClient().getGuilds().get(0).getChannelsByName(channelName)) {
                             MessageAPI.sendToDiscord(cha, "This is a test payload!");
                         }
+                        cs.sendMessage(ChatColor.GREEN + "Sent a test payload");
                         break;
                     }
                 }
