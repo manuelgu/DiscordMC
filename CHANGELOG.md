@@ -9,9 +9,9 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - Strip color codes from chat messages sent to discord
 - Always send messages and queue them if getting 429's
 - /discord debug sendtest <channel>, sends a test payload
-- No way too long stracktrace on first startup anymore
+- Catching exception when token is invalid on first startup
 - Color codes from Discord will no longer make the message colored
 - Using #saveDefaultConfig, recommended to reset the configuration file due to major changes to the format
-- Sets the Bots game to "Minecraft"
+- Set the game of the Bot to "Minecraft" by default
 - Support nicknames for message templates and mentions
 - Performance improvements
