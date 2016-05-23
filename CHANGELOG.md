@@ -12,3 +12,4 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - No way too long stracktrace on first startup anymore
 - Color codes from Discord will no longer make the message colored
 - Using #saveDefaultConfig, recommended to reset the configuration file due to major changes to the format
+- Sets the Bots game to "Minecraft"

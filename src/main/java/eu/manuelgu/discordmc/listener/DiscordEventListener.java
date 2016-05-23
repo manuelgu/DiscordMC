@@ -122,6 +122,9 @@ public class DiscordEventListener {
 
     @EventSubscriber
     public void onReady(final ReadyEvent event) {
+        // Set game to Minecraft
+        DiscordMC.getClient().changeStatus(Status.game("Minecraft"));
+
         // Check for file encoder (emoji-related)
         switch (System.getProperty("file.encoding")) {
             case "UTF8":
