@@ -93,7 +93,6 @@ public class DiscordMC extends JavaPlugin {
 
     }
 
-    // INFO: GuildCreateEvent gets called AFTER ReadyEvent (as of 2.4.x, will be different in 2.5)
     @EventSubscriber
     public void onGuildCreate(GuildCreateEvent event) {
         if (event.getGuild() == null) {
