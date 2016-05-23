@@ -7,5 +7,5 @@ website: "https://www.spigotmc.org/resources/17067/"
 
 commands:
   discord:
-    description: Main Command for DiscordMC
-    usage: /<command> <logout|login|lookup>
+    description: Command for DiscordMC
+    usage: /<command> <args>
