@@ -3,7 +3,7 @@ author: manuelgu
 version: ${project.version}
 main: ${project.groupId}.discordmc.${project.name}
 description: ${project.description}
-website: "https://manuelgu.eu"
+website: "https://www.spigotmc.org/resources/17067/"
 
 commands:
   discord:
