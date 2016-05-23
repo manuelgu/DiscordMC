@@ -1,6 +1,6 @@
 # DiscordMC by manuelgu
-# https://manuelgu.eu
 # https://www.spigotmc.org/resources/17067/
+# https://manuelgu.eu
 settings:
   token: 'TOKEN_HERE'
   send_game_login: true
