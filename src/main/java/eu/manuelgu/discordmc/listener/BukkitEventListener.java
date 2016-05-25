@@ -20,7 +20,7 @@ public class BukkitEventListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onChat(AsyncPlayerChatEvent event) {
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         if (!plugin.getConfig().getBoolean("settings.send_game_chat")) {
             return;
         }
@@ -81,7 +81,7 @@ public class BukkitEventListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onJoin(PlayerJoinEvent event) {
+    public void onAdminPlayerJoin(PlayerJoinEvent event) {
         if (!plugin.getConfig().getBoolean("settings.check_for_updates")) {
             return;
         }
