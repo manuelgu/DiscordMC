@@ -142,7 +142,7 @@ public class DiscordCommand implements CommandExecutor {
                     message += args[i] + " ";
                 }
                 String finalMessage = message;
-                List<IChannel> ch = DiscordUtil.getChannelMatchingName(channel);
+                List<IChannel> ch = DiscordMC.getClient().getGuilds().get(0).getChannelsByName(channel);
 
                 if (ch == null) {
                     cs.sendMessage(ChatColor.RED + "Channel not found");
