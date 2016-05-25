@@ -2,6 +2,7 @@ package eu.manuelgu.discordmc.listener;
 
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
+import eu.manuelgu.discordmc.util.DiscordUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -16,7 +17,6 @@ import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Status;
@@ -29,24 +29,23 @@ public class DiscordEventListener {
     private boolean relayChat;
     private boolean commands;
     private boolean useNickname;
-    private List<String> names;
+    private String commandPrefix;
 
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
         relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat");
         commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled");
         useNickname = plugin.getConfig().getBoolean("settings.use_nicknames");
-        names = DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList());
+        commandPrefix = plugin.getConfig().getString("settings.discord_commands.command_prefix");
     }
 
     @EventSubscriber
     public void userChat(final MessageReceivedEvent event) {
-        final String channelName = event.getMessage().getChannel().getName();
-        if (!names.contains(channelName)) {
+        if (!DiscordUtil.isValidChannel(event.getMessage().getChannel())) {
             return;
         }
 
-        if (commands && event.getMessage().getContent().startsWith(plugin.getConfig().getString("settings.discord_commands.command_prefix")) && event.getMessage().getContent().length() > 1) {
+        if (commands && event.getMessage().getContent().startsWith(commandPrefix) && event.getMessage().getContent().length() > 1) {
             // Commands enabled and it is a valid command
             switch (event.getMessage().getContent().substring(1)) {
                 case "help":
@@ -106,6 +105,7 @@ public class DiscordEventListener {
     public void onDisconnect(final DiscordDisconnectedEvent event) {
         plugin.getLogger().info("Bot got disconnected with reason " + event.getReason().name());
         if (event.getReason() == DiscordDisconnectedEvent.Reason.LOGGED_OUT) {
+            // Don't attempt to reconnect when we logged out normally
             return;
         }
 
