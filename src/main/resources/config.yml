@@ -1,6 +1,6 @@
 # DiscordMC by manuelgu
 # https://www.spigotmc.org/resources/17067/
-# https://manuelgu.eu
+# https://gist.github.com/manuelgu/545632583e68c594fd0a5db3512ab5ce
 settings:
   token: 'TOKEN_HERE'
   send_game_login: true
@@ -16,11 +16,9 @@ settings:
     player_leave_minecraft: '%u left the game'
     chat_message_minecraft: '<&b(discord [%c]) &r%u> %m'
   channels:
-    # Channels below will receive messages from Minecraft
     minecraft_to_discord:
       - 'chatlog'
       - 'chatting'
-    # Channels below will send messages to Minecraft
     discord_to_minecraft:
       - 'chatting'
       - 'announcement'

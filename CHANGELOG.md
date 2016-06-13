@@ -11,7 +11,6 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - /discord debug sendtest <channel>, sends a test payload
 - Catching exception when token is invalid on first startup
 - Color codes from Discord will no longer make the message colored
-- Using #saveDefaultConfig, recommended to reset the configuration file due to major changes to the format
 - Set the game of the Bot to "Minecraft" by default
-- Support nicknames for message templates and mentions
+- Support nicknames for messages and mentions
 - Performance improvements

@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.EventSubscriber;
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.GuildCreateEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.modules.Configuration;
 import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
+import sx.blah.discord.util.RateLimitException;
 
 public class DiscordMC extends JavaPlugin {
     public static DiscordMC instance;
@@ -124,7 +124,7 @@ public class DiscordMC extends JavaPlugin {
         }
         try {
             client.logout();
-        } catch (DiscordException | HTTP429Exception ignored) {
+        } catch (DiscordException | RateLimitException ignored) {
             getLogger().severe("Failed to logout");
         }
     }

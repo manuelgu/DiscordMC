@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.HTTP429Exception;
+import sx.blah.discord.util.RateLimitException;
 
 /**
  * Util class for utility methods
@@ -23,7 +23,7 @@ public class DiscordUtil {
         try {
             client.logout();
             return true;
-        } catch (DiscordException | HTTP429Exception ignored) {
+        } catch (DiscordException | RateLimitException ignored) {
             return false;
         }
     }

@@ -115,6 +115,8 @@ public class DiscordCommand implements CommandExecutor {
                         }
                         cs.sendMessage(ChatColor.GREEN + "Sent a test payload");
                         break;
+                    } else {
+                        break;
                     }
                 }
                 String debugInfo = getDebugInfo();
@@ -160,6 +162,7 @@ public class DiscordCommand implements CommandExecutor {
 
     /**
      * Get debug information about current setup
+     *
      * @return debug info in one long string with line breaks
      */
     private String getDebugInfo() {
