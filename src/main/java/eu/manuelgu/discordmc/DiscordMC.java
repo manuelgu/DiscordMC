@@ -5,7 +5,10 @@ import eu.manuelgu.discordmc.listener.DiscordEventListener;
 import eu.manuelgu.discordmc.update.Updater;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import lombok.Getter;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
@@ -36,6 +39,13 @@ public class DiscordMC extends JavaPlugin {
      */
     @Getter
     public static List<IChannel> minecraftToDiscord;
+
+    @Getter
+    public static Set<UUID> cachedHasChatPermission;
+
+    /**
+     * If token was valid or not
+     */
     private static boolean validToken;
 
     /**
@@ -57,6 +67,8 @@ public class DiscordMC extends JavaPlugin {
         Configuration.AUTOMATICALLY_ENABLE_MODULES = false;
 
         new MessageAPI(this);
+
+        cachedHasChatPermission = new HashSet<>();
 
         String token = getConfig().getString("settings.token");
 

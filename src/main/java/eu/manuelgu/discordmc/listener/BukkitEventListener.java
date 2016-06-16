@@ -11,8 +11,10 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import lombok.Getter;
 
 public class BukkitEventListener implements Listener {
+    @Getter
     private final DiscordMC plugin;
 
     public BukkitEventListener(DiscordMC plugin) {
@@ -21,7 +23,7 @@ public class BukkitEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-        if (!plugin.getConfig().getBoolean("settings.send_game_chat")) {
+        if (!getPlugin().getConfig().getBoolean("settings.send_game_chat")) {
             return;
         }
         if (!canChat(event.getPlayer())) {
@@ -30,7 +32,7 @@ public class BukkitEventListener implements Listener {
         final String username = event.getPlayer().getName();
         final String message = event.getMessage();
 
-        final String formattedMessage = plugin.getConfig().getString("settings.templates.chat_message_discord")
+        final String formattedMessage = getPlugin().getConfig().getString("settings.templates.chat_message_discord")
                 .replaceAll("%u", username)
                 .replaceAll("%m", message);
 
@@ -39,14 +41,17 @@ public class BukkitEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        if (!plugin.getConfig().getBoolean("settings.send_game_login")) {
+        if (!getPlugin().getConfig().getBoolean("settings.send_game_login")) {
             return;
         }
         if (!canChat(event.getPlayer())) {
             return;
+        } else {
+            // Add to cache
+            DiscordMC.getCachedHasChatPermission().add(event.getPlayer().getUniqueId());
         }
         final String username = event.getPlayer().getName();
-        final String formattedMessage = plugin.getConfig().getString("settings.templates.player_join_minecraft")
+        final String formattedMessage = getPlugin().getConfig().getString("settings.templates.player_join_minecraft")
                 .replaceAll("%u", username);
 
         MessageAPI.sendToDiscord(formattedMessage);
@@ -54,14 +59,15 @@ public class BukkitEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        if (!plugin.getConfig().getBoolean("settings.send_game_logout")) {
+        if (!getPlugin().getConfig().getBoolean("settings.send_game_logout")) {
             return;
         }
-        if (!canChat(event.getPlayer())) {
+        if (!DiscordMC.getCachedHasChatPermission().contains(event.getPlayer().getUniqueId())) {
             return;
         }
+        DiscordMC.getCachedHasChatPermission().remove(event.getPlayer().getUniqueId());
         final String username = event.getPlayer().getName();
-        final String formattedMessage = plugin.getConfig().getString("settings.templates.player_leave_minecraft")
+        final String formattedMessage = getPlugin().getConfig().getString("settings.templates.player_leave_minecraft")
                 .replaceAll("%u", username);
 
         MessageAPI.sendToDiscord(formattedMessage);
@@ -69,7 +75,7 @@ public class BukkitEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (!plugin.getConfig().getBoolean("settings.send_death_message")) {
+        if (!getPlugin().getConfig().getBoolean("settings.send_death_message")) {
             return;
         }
         if (!canChat(event.getEntity())) {
@@ -82,13 +88,13 @@ public class BukkitEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAdminPlayerJoin(PlayerJoinEvent event) {
-        if (!plugin.getConfig().getBoolean("settings.check_for_updates")) {
+        if (!getPlugin().getConfig().getBoolean("settings.check_for_updates")) {
             return;
         }
         if (!event.getPlayer().hasPermission("discordmc.admin")) {
             return;
         }
-        Updater.sendUpdateMessage(event.getPlayer().getUniqueId(), plugin);
+        Updater.sendUpdateMessage(event.getPlayer().getUniqueId(), getPlugin());
     }
 
     private boolean canChat(Player player) {

@@ -9,3 +9,27 @@ commands:
   discord:
     description: Command for DiscordMC
     usage: /<command> <args>
+
+permissions:
+  discordmc.*:
+    description: Grants access to all DiscordMC features
+    children:
+      discordmc.chat: true
+      discordmc.admin: true
+      discordmc.command.send: true
+      discordmc.command.logout: true
+      discordmc.command.login: true
+      discordmc.comamand.lookup: true
+  discordmc.chat:
+    default: op
+  discordmc.admin:
+        default: op
+  discordmc.command.send:
+        default: op
+  discordmc.command.logout:
+        default: op
+  discordmc.command.login:
+        default: op
+  discordmc.command.lookup:
+        default: op
+
