@@ -1,5 +1,4 @@
-# DiscordMC
-[![Build Status](https://ci.manuelgu.eu/buildStatus/icon?job=DiscordMC)](https://ci.manuelgu.eu/job/DiscordMC/)
+# DiscordMC [![Build Status](https://ci.manuelgu.eu/buildStatus/icon?job=DiscordMC)](https://ci.manuelgu.eu/job/DiscordMC/)
 DiscordMC is a plugin for [Spigot](https://spigotmc.org) which allows you to send messages from Minecraft to Discord and vice versa
 
 ## Spigot page
