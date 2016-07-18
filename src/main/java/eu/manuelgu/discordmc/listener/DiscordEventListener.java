@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Status;
-import sx.blah.discord.util.DiscordException;
 
 public class DiscordEventListener {
     private final DiscordMC plugin;
@@ -104,34 +102,6 @@ public class DiscordEventListener {
     @EventSubscriber
     public void onDisconnect(final DiscordDisconnectedEvent event) {
         plugin.getLogger().info("Bot got disconnected with reason " + event.getReason().name());
-        if (event.getReason() == DiscordDisconnectedEvent.Reason.LOGGED_OUT) {
-            // Don't attempt to reconnect when we logged out normally
-            return;
-        }
-
-        // Auto reconnect
-        try {
-            reconnectTimer = new Timer();
-            reconnectTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (!event.getClient().isReady()) {
-                        try {
-                            event.getClient().login();
-                            plugin.getLogger().info("Logged in again after a timeout");
-                        } catch (DiscordException e) {
-                            plugin.getLogger().severe("Failed to relog to the Discord servers..");
-                            e.printStackTrace();
-                        }
-                    } else {
-                        reconnectTimer.cancel();
-                    }
-                }
-            }, (long) 2000, RECONNECT_DELAY);
-        } catch (Exception e) {
-            e.printStackTrace();
-            plugin.getLogger().severe("There was a problem with reconnecting.. Please report the above stacktrace to the developer");
-        }
     }
 
     @EventSubscriber

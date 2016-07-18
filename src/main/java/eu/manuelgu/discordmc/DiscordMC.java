@@ -88,7 +88,7 @@ public class DiscordMC extends JavaPlugin {
 
         // Client builder and login
         try {
-            client = new ClientBuilder().withToken(token).login();
+            client = new ClientBuilder().withToken(token).withReconnects().login();
         } catch (DiscordException e) {
             e.printStackTrace();
             getLogger().severe("Failed to login");
