@@ -49,6 +49,8 @@ public class BukkitEventListener implements Listener {
         } else {
             // Add to cache
             DiscordMC.getCachedHasChatPermission().add(event.getPlayer().getUniqueId());
+            // Add player as a permissive player
+            DiscordMC.getPermissivePlayers().add(event.getPlayer().getUniqueId());
         }
         final String username = event.getPlayer().getName();
         final String formattedMessage = getPlugin().getConfig().getString("settings.templates.player_join_minecraft")
@@ -71,6 +73,8 @@ public class BukkitEventListener implements Listener {
                 .replaceAll("%u", username);
 
         MessageAPI.sendToDiscord(formattedMessage);
+        // Remove player as a permissive player
+        DiscordMC.getPermissivePlayers().remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -98,6 +102,6 @@ public class BukkitEventListener implements Listener {
     }
 
     private boolean canChat(Player player) {
-        return player.hasPermission("discordmc.chat");
+        return player.hasPermission("discordmc.chat") && DiscordMC.getPermissivePlayers().contains(player.getUniqueId());
     }
 }

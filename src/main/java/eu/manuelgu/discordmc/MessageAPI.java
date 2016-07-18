@@ -29,8 +29,10 @@ public class MessageAPI {
                 .replaceAll("%u", username)
                 .replaceAll("%c", origin.getName()));
 
-        Bukkit.broadcastMessage(EmojiParser.parseToAliases(formattedMessage
-                .replaceAll("%m", ChatColor.stripColor(message))));
+        DiscordMC.getPermissivePlayers().stream()
+                .forEach(uuid -> Bukkit.getPlayer(uuid).sendMessage(
+                        EmojiParser.parseToAliases(formattedMessage
+                        .replaceAll("%m", ChatColor.stripColor(message)))));
     }
 
     /**

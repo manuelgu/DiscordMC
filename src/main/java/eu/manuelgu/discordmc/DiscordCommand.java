@@ -9,7 +9,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -153,6 +155,25 @@ public class DiscordCommand implements CommandExecutor {
                 MessageAPI.sendToDiscord(ch, finalMessage);
                 cs.sendMessage(ChatColor.GREEN + "Message sent");
                 break;
+            case "toggle":
+                if (!cs.hasPermission("discordmc.command.toggle")) {
+                    cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
+                    break;
+                }
+                if (!(cs instanceof Player)) {
+                    cs.sendMessage(ChatColor.RED + "Only players can execute this command");
+                    break;
+                }
+                Player player = (Player) cs;
+                if (DiscordMC.getPermissivePlayers().contains(player.getUniqueId())) {
+                    DiscordMC.getPermissivePlayers().remove(player.getUniqueId());
+                    // toggled off
+                    player.sendMessage(ChatColor.BLUE + "You have disabled the Discord module for yourself.");
+                } else {
+                    DiscordMC.getPermissivePlayers().add(player.getUniqueId());
+                    // toggled on
+                    player.sendMessage(ChatColor.BLUE + "You have enabled the Discord module for yourself.");
+                }
             default:
                 cs.sendMessage(ChatColor.RED + USAGE);
                 break;
