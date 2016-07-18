@@ -53,6 +53,6 @@ public class DiscordUtil {
     }
 
     static {
-        names = DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList());
+        names = DiscordMC.getDiscordToMinecraft().stream().map(IChannel::getName).collect(Collectors.toList());
     }
 }

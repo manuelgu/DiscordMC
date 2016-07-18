@@ -238,9 +238,9 @@ public class DiscordCommand implements CommandExecutor {
         b.append("\nbotName: ").append(DiscordMC.getClient().getOurUser().getName()).append('\n');
         b.append("channels:\n");
         b.append("  minecraftToDiscord: ").append(StringUtils.join(
-                DiscordMC.minecraftToDiscord.stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
+                DiscordMC.getMinecraftToDiscord().stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
         b.append("  discordToMinecraft: ").append(StringUtils.join(
-                DiscordMC.discordToMinecraft.stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
+                DiscordMC.getMinecraftToDiscord().stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
 
         return b.toString();
     }

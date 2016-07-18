@@ -3,13 +3,14 @@ package eu.manuelgu.discordmc;
 import eu.manuelgu.discordmc.listener.BukkitEventListener;
 import eu.manuelgu.discordmc.listener.DiscordEventListener;
 import eu.manuelgu.discordmc.update.Updater;
+import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import lombok.Getter;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -32,16 +33,19 @@ public class DiscordMC extends JavaPlugin {
      * Channels that send messages to Minecraft
      */
     @Getter
-    public static List<IChannel> discordToMinecraft;
+    private static List<IChannel> discordToMinecraft;
 
     /**
      * Channels that receive messages from Minecraft
      */
     @Getter
-    public static List<IChannel> minecraftToDiscord;
+    private static List<IChannel> minecraftToDiscord;
 
     @Getter
-    public static Set<UUID> cachedHasChatPermission;
+    private static Set<UUID> cachedHasChatPermission;
+
+    @Getter
+    private static Set<UUID> permissivePlayers;
 
     /**
      * If token was valid or not
