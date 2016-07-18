@@ -3,6 +3,7 @@ package eu.manuelgu.discordmc.listener;
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
 import eu.manuelgu.discordmc.update.Updater;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,7 +12,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import lombok.Getter;
 
 public class BukkitEventListener implements Listener {
     @Getter
@@ -49,6 +49,7 @@ public class BukkitEventListener implements Listener {
         } else {
             // Add to cache
             DiscordMC.getCachedHasChatPermission().add(event.getPlayer().getUniqueId());
+
             // Add player as a permissive player
             DiscordMC.getPermissivePlayers().add(event.getPlayer().getUniqueId());
         }
@@ -73,6 +74,7 @@ public class BukkitEventListener implements Listener {
                 .replaceAll("%u", username);
 
         MessageAPI.sendToDiscord(formattedMessage);
+
         // Remove player as a permissive player
         DiscordMC.getPermissivePlayers().remove(event.getPlayer().getUniqueId());
     }

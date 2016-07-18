@@ -3,6 +3,7 @@ package eu.manuelgu.discordmc;
 import com.vdurmont.emoji.EmojiParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+
 import java.util.List;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
@@ -20,7 +21,7 @@ public class MessageAPI {
     /**
      * Send a chat message to the Minecraft server
      *
-     * @param origin {@link IChannel} the message came from
+     * @param origin   {@link IChannel} the message came from
      * @param username player who sent the message
      * @param message  the actual message which gets sent
      */
@@ -60,6 +61,7 @@ public class MessageAPI {
 
     /**
      * Send a message to a specific channel
+     *
      * @param channel channel to receive message
      * @param message message to send
      */
@@ -70,7 +72,7 @@ public class MessageAPI {
             } catch (DiscordException ignored) {
             } catch (MissingPermissionsException e) {
                 plugin.getLogger().severe("Your Bot is missing required permissions to perform this action! "
-                    + e.getErrorMessage());
+                        + e.getErrorMessage());
             }
             return null;
         });
@@ -78,8 +80,9 @@ public class MessageAPI {
 
     /**
      * Send a message to a list of specific channels
+     *
      * @param channels channels that receive message
-     * @param message message to send
+     * @param message  message to send
      */
     public static void sendToDiscord(List<IChannel> channels, String message) {
         channels.stream().forEach(channel -> sendToDiscord(channel, message));
