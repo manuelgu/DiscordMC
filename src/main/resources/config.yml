@@ -14,7 +14,7 @@ settings:
     chat_message_discord: '**%u**: %m'
     player_join_minecraft: '%u joined the game'
     player_leave_minecraft: '%u left the game'
-    chat_message_minecraft: '<&b(discord [%c]) &r%u> %m'
+    chat_message_minecraft: '&b(discord [%c]) &r%u >> %m'
   channels:
     minecraft_to_discord:
       - 'chatlog'
