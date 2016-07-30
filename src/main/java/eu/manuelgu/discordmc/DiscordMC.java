@@ -66,6 +66,7 @@ public class DiscordMC extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
+
         // Disable all modules
         Configuration.LOAD_EXTERNAL_MODULES = false;
         Configuration.AUTOMATICALLY_ENABLE_MODULES = false;
@@ -73,6 +74,7 @@ public class DiscordMC extends JavaPlugin {
         new MessageAPI(this);
 
         cachedHasChatPermission = new HashSet<>();
+        permissivePlayers = new HashSet<>();
 
         String token = getConfig().getString("settings.token");
 
