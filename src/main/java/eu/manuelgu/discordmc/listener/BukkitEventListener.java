@@ -26,7 +26,7 @@ public class BukkitEventListener implements Listener {
         if (!getPlugin().getConfig().getBoolean("settings.send_game_chat")) {
             return;
         }
-        if (!canChat(event.getPlayer())) {
+        if (!isPermissive(event.getPlayer()) || !hasChatPermission(event.getPlayer())) {
             return;
         }
         final String username = event.getPlayer().getName();
@@ -44,7 +44,7 @@ public class BukkitEventListener implements Listener {
         if (!getPlugin().getConfig().getBoolean("settings.send_game_login")) {
             return;
         }
-        if (!canChat(event.getPlayer())) {
+        if (!hasChatPermission(event.getPlayer())) {
             return;
         } else {
             // Add to cache
@@ -84,7 +84,7 @@ public class BukkitEventListener implements Listener {
         if (!getPlugin().getConfig().getBoolean("settings.send_death_message")) {
             return;
         }
-        if (!canChat(event.getEntity())) {
+        if (!isPermissive(event.getEntity()) || !hasChatPermission(event.getEntity())) {
             return;
         }
         final String deathMessage = event.getDeathMessage();
@@ -103,7 +103,11 @@ public class BukkitEventListener implements Listener {
         Updater.sendUpdateMessage(event.getPlayer().getUniqueId(), getPlugin());
     }
 
-    private boolean canChat(Player player) {
-        return player.hasPermission("discordmc.chat") && DiscordMC.getPermissivePlayers().contains(player.getUniqueId());
+    private boolean isPermissive(Player player) {
+        return DiscordMC.getPermissivePlayers().contains(player.getUniqueId());
+    }
+
+    private boolean hasChatPermission(Player player) {
+        return player.hasPermission("discordmc.chat");
     }
 }
