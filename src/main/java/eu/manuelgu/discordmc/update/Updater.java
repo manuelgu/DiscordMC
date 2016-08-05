@@ -19,8 +19,9 @@ import java.util.UUID;
 
 public class Updater {
     public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[DiscordMC] " + ChatColor.GREEN;
-    private final static String URL = "http://api.spiget.org/v1/resources/";
+    private final static String URL = "http://api.spiget.org/v2/resources/";
     private final static int PLUGIN = 17067;
+	private final static String LATEST_VERSION = "/versions/latest";
 
     public static void sendUpdateMessage(final UUID uuid, final Plugin plugin) {
         if (DiscordMC.get().getDescription().getVersion().endsWith("-SNAPSHOT")) {
@@ -114,7 +115,7 @@ public class Updater {
      */
     public static String getNewestVersion(int pluginId) {
         try {
-            URL url = new URL(URL + pluginId + "?" + System.currentTimeMillis());
+            URL url = new URL(URL + pluginId + LATEST_VERSION + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
             connection.addRequestProperty("User-Agent", "DiscordMC " + DiscordMC.get().getDescription().getVersion());
@@ -134,7 +135,7 @@ public class Updater {
                 e.printStackTrace();
                 return null;
             }
-            return (String) statistics.get("version");
+            return (String) statistics.get("name");
         } catch (MalformedURLException e) {
             return null;
         } catch (IOException e) {
