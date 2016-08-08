@@ -15,3 +15,4 @@ Changelog can generally be found here https://www.spigotmc.org/resources/17067/u
 - Support nicknames for messages and mentions
 - Performance improvements
 - Use /discord toggle to temporarily toggle the discord integration for the user
+- Use /v2 endpoint for Spiget API
