@@ -118,7 +118,7 @@ public class Updater {
             URL url = new URL(URL + pluginId + LATEST_VERSION + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
-            connection.addRequestProperty("User-Agent", "DiscordMC " + DiscordMC.get().getDescription().getVersion());
+            connection.addRequestProperty("User-Agent", "DiscordMC/" + DiscordMC.get().getDescription().getVersion());
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String input;
