@@ -12,9 +12,9 @@ settings:
   check_for_updates: true
   templates:
     chat_message_discord: '**%u**: %m'
-    player_join_minecraft: '%u joined the game'
-    player_leave_minecraft: '%u left the game'
-    chat_message_minecraft: '&b(discord [%c]) &r%u >> %m'
+    player_join_minecraft: '%user joined the game'
+    player_leave_minecraft: '%user left the game'
+    chat_message_minecraft: '&b(discord [%channel]) &r%user >> %message'
   channels:
     minecraft_to_discord:
       - 'chatlog'
@@ -25,3 +25,6 @@ settings:
   discord_commands:
     enabled: true
     command_prefix: '?'
+  hooks:
+    hook_channels:
+    - 'chit-chat'

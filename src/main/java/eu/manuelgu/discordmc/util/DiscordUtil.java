@@ -1,12 +1,13 @@
 package eu.manuelgu.discordmc.util;
 
 import eu.manuelgu.discordmc.DiscordMC;
-import java.util.List;
-import java.util.stream.Collectors;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RateLimitException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Util class for utility methods
@@ -14,8 +15,18 @@ import sx.blah.discord.util.RateLimitException;
 public class DiscordUtil {
     public static List<String> names;
 
+    static {
+        List<String> toDiscord, toMinecraft;
+        toMinecraft = DiscordMC.getDiscordToMinecraft().stream().map(IChannel::getName).collect(Collectors.toList());
+        toDiscord = DiscordMC.getMinecraftToDiscord().stream().map(IChannel::getName).collect(Collectors.toList());
+
+        names.addAll(toMinecraft);
+        names.addAll(toDiscord);
+    }
+
     /**
      * Logout the client
+     *
      * @param client client to disconnect
      * @return True when disconnect was successful, False if otherwise
      */
@@ -30,6 +41,7 @@ public class DiscordUtil {
 
     /**
      * Login the client
+     *
      * @param client client to connect
      * @return True when connect was successful, False if otherwise
      */
@@ -50,9 +62,5 @@ public class DiscordUtil {
      */
     public static boolean isValidChannel(IChannel channel) {
         return names.contains(channel.getName());
-    }
-
-    static {
-        names = DiscordMC.getDiscordToMinecraft().stream().map(IChannel::getName).collect(Collectors.toList());
     }
 }

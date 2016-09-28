@@ -11,20 +11,20 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Presences;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 public class DiscordCommand implements CommandExecutor {
-    private final String USAGE = "Usage: /discord <logout|login|lookup|send|debug>";
+    private final String USAGE = "Usage: /discord <logout|login|lookup|send|debug|toggle>";
     private final String LACKING_PERMISSION = "You are lacking the required permission to execute this command";
 
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
@@ -89,7 +89,7 @@ public class DiscordCommand implements CommandExecutor {
                 }
 
                 String name = lookupUser[0].getName();
-                Optional<String> game = lookupUser[0].getGame();
+                Optional<String> game = Optional.ofNullable(lookupUser[0].getStatus().getStatusMessage());
                 boolean isBot = lookupUser[0].isBot();
                 String id = lookupUser[0].getID();
                 List<IRole> roles = lookupUser[0].getRolesForGuild(DiscordMC.getClient().getGuilds().get(0));
@@ -165,12 +165,12 @@ public class DiscordCommand implements CommandExecutor {
                     break;
                 }
                 Player player = (Player) cs;
-                if (DiscordMC.getPermissivePlayers().contains(player.getUniqueId())) {
-                    DiscordMC.getPermissivePlayers().remove(player.getUniqueId());
+                if (DiscordMC.getSubscribedPlayers().contains(player.getUniqueId())) {
+                    DiscordMC.getSubscribedPlayers().remove(player.getUniqueId());
                     // toggled off
                     player.sendMessage(ChatColor.BLUE + "You have disabled the Discord module for yourself.");
                 } else {
-                    DiscordMC.getPermissivePlayers().add(player.getUniqueId());
+                    DiscordMC.getSubscribedPlayers().add(player.getUniqueId());
                     // toggled on
                     player.sendMessage(ChatColor.BLUE + "You have enabled the Discord module for yourself.");
                 }

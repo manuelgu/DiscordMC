@@ -11,15 +11,18 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Util class to upload a text to hastebin.com and retrieve the url
+ */
 public class HastebinUtility {
     private static final String BIN_URL = "http://hastebin.com/documents", USER_AGENT = "Mozilla/5.0";
     private static final Pattern PATTERN = Pattern.compile("\\{\"key\":\"([\\S\\s]*)\"\\}");
 
     /**
      * Upload a haste to www.hastebin.com
+     *
      * @param string Content of the haste
      * @return URL of uploaded haste
-     * @throws IOException
      */
     public static String upload(final String string) throws IOException {
         final URL url = new URL(BIN_URL);

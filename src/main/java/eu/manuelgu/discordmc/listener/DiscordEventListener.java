@@ -2,17 +2,9 @@ package eu.manuelgu.discordmc.listener;
 
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
-import eu.manuelgu.discordmc.util.DiscordUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
@@ -21,10 +13,13 @@ import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Status;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public class DiscordEventListener {
     private final DiscordMC plugin;
-    private final long RECONNECT_DELAY = TimeUnit.SECONDS.toMillis(15);
-    private Timer reconnectTimer;
     private boolean relayChat;
     private boolean commands;
     private boolean useNickname;
@@ -39,11 +34,7 @@ public class DiscordEventListener {
     }
 
     @EventSubscriber
-    public void userChat(final MessageReceivedEvent event) {
-        if (!DiscordUtil.isValidChannel(event.getMessage().getChannel())) {
-            return;
-        }
-
+    public void userChat(MessageReceivedEvent event) {
         if (commands && event.getMessage().getContent().startsWith(commandPrefix) && event.getMessage().getContent().length() > 1) {
             // Commands enabled and it is a valid command
             switch (event.getMessage().getContent().substring(1)) {

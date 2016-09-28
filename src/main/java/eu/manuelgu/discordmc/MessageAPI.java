@@ -3,13 +3,13 @@ package eu.manuelgu.discordmc;
 import com.vdurmont.emoji.EmojiParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-
-import java.util.List;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
+
+import java.util.List;
 
 public class MessageAPI {
     private static DiscordMC plugin;
@@ -27,13 +27,12 @@ public class MessageAPI {
      */
     public static void sendToMinecraft(IChannel origin, String username, String message) {
         String formattedMessage = ChatColor.translateAlternateColorCodes('&', DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
-                .replaceAll("%u", username)
-                .replaceAll("%c", origin.getName()));
+                .replace("%user", username)
+                .replace("%channel", origin.getName()));
 
-        DiscordMC.getPermissivePlayers().stream()
-                .forEach(uuid -> Bukkit.getPlayer(uuid).sendMessage(
-                        EmojiParser.parseToAliases(formattedMessage
-                        .replaceAll("%m", ChatColor.stripColor(message)))));
+        DiscordMC.getSubscribedPlayers().forEach(uuid -> Bukkit.getPlayer(uuid).sendMessage(
+                EmojiParser.parseToAliases(formattedMessage
+                        .replaceAll("%message", ChatColor.stripColor(message)))));
     }
 
     /**
@@ -54,9 +53,7 @@ public class MessageAPI {
         if (!DiscordMC.getClient().isReady()) {
             return;
         }
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            DiscordMC.getMinecraftToDiscord().forEach(channel -> sendToDiscord(channel, message));
-        });
+        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> DiscordMC.getMinecraftToDiscord().forEach(channel -> sendToDiscord(channel, message)));
     }
 
     /**
@@ -85,6 +82,6 @@ public class MessageAPI {
      * @param message  message to send
      */
     public static void sendToDiscord(List<IChannel> channels, String message) {
-        channels.stream().forEach(channel -> sendToDiscord(channel, message));
+        channels.forEach(channel -> sendToDiscord(channel, message));
     }
 }

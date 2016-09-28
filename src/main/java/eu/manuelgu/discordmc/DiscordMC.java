@@ -3,14 +3,9 @@ package eu.manuelgu.discordmc;
 import eu.manuelgu.discordmc.listener.BukkitEventListener;
 import eu.manuelgu.discordmc.listener.DiscordEventListener;
 import eu.manuelgu.discordmc.update.Updater;
+import gnu.trove.set.hash.THashSet;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -19,6 +14,11 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.modules.Configuration;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RateLimitException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class DiscordMC extends JavaPlugin {
     public static DiscordMC instance;
@@ -41,11 +41,17 @@ public class DiscordMC extends JavaPlugin {
     @Getter
     private static List<IChannel> minecraftToDiscord;
 
+    /**
+     * Players that have the permissions to use the plugin
+     */
     @Getter
     private static Set<UUID> cachedHasChatPermission;
 
+    /**
+     * Subscribed players that receive messages
+     */
     @Getter
-    private static Set<UUID> permissivePlayers;
+    private static Set<UUID> subscribedPlayers;
 
     /**
      * If token was valid or not
@@ -66,15 +72,15 @@ public class DiscordMC extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-
         // Disable all modules
         Configuration.LOAD_EXTERNAL_MODULES = false;
         Configuration.AUTOMATICALLY_ENABLE_MODULES = false;
 
+        // Initialize messaging API
         new MessageAPI(this);
 
-        cachedHasChatPermission = new HashSet<>();
-        permissivePlayers = new HashSet<>();
+        cachedHasChatPermission = new THashSet<>();
+        subscribedPlayers = new THashSet<>();
 
         String token = getConfig().getString("settings.token");
 
@@ -90,15 +96,22 @@ public class DiscordMC extends JavaPlugin {
 
         // Client builder and login
         try {
-            client = new ClientBuilder().withToken(token).withReconnects().login();
+            client = new ClientBuilder().withToken(token).build();
         } catch (DiscordException e) {
             e.printStackTrace();
-            getLogger().severe("Failed to login");
+            getLogger().severe("Failed to build client");
         }
 
         // Register listeners
         client.getDispatcher().registerListener(new DiscordEventListener(this));
         client.getDispatcher().registerListener(this);
+
+        try {
+            client.login();
+        } catch (DiscordException e) {
+            e.printStackTrace();
+            getLogger().severe("Failed to login");
+        }
 
         // Register bukkit listeners and commands
         getServer().getPluginManager().registerEvents(new BukkitEventListener(this), this);
@@ -109,6 +122,18 @@ public class DiscordMC extends JavaPlugin {
             Updater.sendUpdateMessage(this);
         }
 
+    }
+
+    @Override
+    public void onDisable() {
+        if (!validToken) {
+            return;
+        }
+        try {
+            client.logout();
+        } catch (RateLimitException | DiscordException ignored) {
+            getLogger().warning("Could not logout");
+        }
     }
 
     @EventSubscriber
@@ -133,17 +158,5 @@ public class DiscordMC extends JavaPlugin {
         }
 
         getLogger().info("Successfully logged in with '" + event.getClient().getOurUser().getName() + "'");
-    }
-
-    @Override
-    public void onDisable() {
-        if (!validToken) {
-            return;
-        }
-        try {
-            client.logout();
-        } catch (DiscordException | RateLimitException ignored) {
-            getLogger().severe("Failed to logout");
-        }
     }
 }
