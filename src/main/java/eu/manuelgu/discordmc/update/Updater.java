@@ -1,8 +1,6 @@
 package eu.manuelgu.discordmc.update;
 
-
 import eu.manuelgu.discordmc.DiscordMC;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -11,7 +9,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,8 +19,9 @@ import java.util.UUID;
 
 public class Updater {
     public final static String PREFIX = ChatColor.GREEN + "" + ChatColor.BOLD + "[DiscordMC] " + ChatColor.GREEN;
-    private final static String URL = "http://api.spiget.org/v1/resources/";
+    private final static String URL = "http://api.spiget.org/v2/resources/";
     private final static int PLUGIN = 17067;
+	private final static String LATEST_VERSION = "/versions/latest";
 
     public static void sendUpdateMessage(final UUID uuid, final Plugin plugin) {
         if (DiscordMC.get().getDescription().getVersion().endsWith("-SNAPSHOT")) {
@@ -33,7 +31,7 @@ public class Updater {
 
             @Override
             public void run() {
-                final String message = getUpdateMessage(false);
+                final String message = getUpdateMessage(PLUGIN, false);
                 if (message != null) {
                     new BukkitRunnable() {
 
@@ -51,6 +49,7 @@ public class Updater {
     }
 
     public static void sendUpdateMessage(final Plugin plugin) {
+        // No update notification for snapshot releases
         if (DiscordMC.get().getDescription().getVersion().endsWith("-SNAPSHOT")) {
             return;
         }
@@ -58,7 +57,7 @@ public class Updater {
 
             @Override
             public void run() {
-                final String message = getUpdateMessage(true);
+                final String message = getUpdateMessage(PLUGIN, true);
                 if (message != null) {
                     new BukkitRunnable() {
 
@@ -72,8 +71,16 @@ public class Updater {
         }.runTaskAsynchronously(plugin);
     }
 
-    private static String getUpdateMessage(boolean console) {
-        String newestString = getNewestVersion();
+    /**
+     * Get the update message of a plugin based on its status Possible values: Version is newer, same
+     * or older than uploaded one
+     *
+     * @param pluginId The id of the plugin
+     * @param console  Message for console?
+     * @return Update message for a plugin
+     */
+    private static String getUpdateMessage(int pluginId, boolean console) {
+        String newestString = getNewestVersion(pluginId);
         if (newestString == null) {
             if (console) {
                 return "Could not check for updates, check your connection.";
@@ -100,12 +107,18 @@ public class Updater {
         return null;
     }
 
-    public static String getNewestVersion() {
+    /**
+     * Fetch the newest version of a plugin by its id
+     *
+     * @param pluginId The id of the plugin
+     * @return Version string of newest version
+     */
+    public static String getNewestVersion(int pluginId) {
         try {
-            URL url = new URL(URL + PLUGIN + "?" + System.currentTimeMillis());
+            URL url = new URL(URL + pluginId + LATEST_VERSION + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(true);
-            connection.addRequestProperty("User-Agent", "DiscordMC " + DiscordMC.get().getDescription().getVersion());
+            connection.addRequestProperty("User-Agent", "DiscordMC/" + DiscordMC.get().getDescription().getVersion());
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String input;
@@ -122,7 +135,7 @@ public class Updater {
                 e.printStackTrace();
                 return null;
             }
-            return (String) statistics.get("version");
+            return (String) statistics.get("name");
         } catch (MalformedURLException e) {
             return null;
         } catch (IOException e) {

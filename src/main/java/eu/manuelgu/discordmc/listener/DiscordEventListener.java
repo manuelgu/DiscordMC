@@ -2,47 +2,40 @@ package eu.manuelgu.discordmc.listener;
 
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
-
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import sx.blah.discord.api.EventSubscriber;
+import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.handle.obj.Status;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DiscordEventListener {
     private final DiscordMC plugin;
-    private final long RECONNECT_DELAY = TimeUnit.SECONDS.toMillis(15);
-    private Timer reconnectTimer;
     private boolean relayChat;
     private boolean commands;
+    private boolean useNickname;
+    private String commandPrefix;
 
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
         relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat");
-        commands = plugin.getConfig().getBoolean("settings.enable_discord_commands");
+        commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled");
+        useNickname = plugin.getConfig().getBoolean("settings.use_nicknames");
+        commandPrefix = plugin.getConfig().getString("settings.discord_commands.command_prefix");
     }
 
     @EventSubscriber
-    public void userChat(final MessageReceivedEvent event) {
-        final String channelName = event.getMessage().getChannel().getName();
-        if (!channelName.equalsIgnoreCase(plugin.getConfig().getString("settings.channel"))) {
-            return;
-        }
-
-        if (commands && event.getMessage().getContent().startsWith(plugin.getConfig().getString("settings.command_prefix")) && event.getMessage().getContent().length() > 1) {
+    public void userChat(MessageReceivedEvent event) {
+        if (commands && event.getMessage().getContent().startsWith(commandPrefix) && event.getMessage().getContent().length() > 1) {
             // Commands enabled and it is a valid command
             switch (event.getMessage().getContent().substring(1)) {
                 case "help":
@@ -62,28 +55,38 @@ public class DiscordEventListener {
             if (relayChat) {
                 String content = event.getMessage().getContent();
                 List<IUser> mentions = event.getMessage().getMentions();
+                List<IRole> roleMentions = event.getMessage().getRoleMentions();
 
                 for (IUser u : mentions) {
-                    String name = u.getName();
+                    String name = u.getNicknameForGuild(event.getMessage().getGuild()).get();
                     String id = u.getID();
 
+                    // User name
                     content = content.replaceAll("<@" + id + ">", "@" + name);
+                    // Nick name
+                    content = content.replaceAll("<@!" + id + ">", "@" + name);
                 }
 
-                String[] trimmedContent = content.split("\\s+");
-                int i = 0;
-                for (String tmp : trimmedContent) {
-                    if (tmp.startsWith("<@&") && tmp.endsWith(">")) {
-                        // Is role mention
-                        String id = tmp.substring(3, tmp.length() - 1);
-                        String roleName = event.getMessage().getGuild().getRoleByID(id).getName();
+                for (IRole r : roleMentions) {
+                    String roleName = r.getName();
+                    String roleId = r.getID();
 
-                        trimmedContent[i] = "@" + roleName;
+                    content = content.replaceAll("<@&" + roleId + ">", "@" + roleName);
+                }
+
+                String nickname = null;
+                if (useNickname && event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild()).isPresent()) {
+                    Optional<String> nick = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild());
+                    if (nick.isPresent()) {
+                        nickname = nick.get();
                     }
-                    i++;
+                } else {
+                    useNickname = false;
                 }
 
-                MessageAPI.sendToMinecraft(event.getMessage().getAuthor().getName(), StringUtils.join(Arrays.asList(trimmedContent), " "));
+                MessageAPI.sendToMinecraft(event.getMessage().getChannel(),
+                        useNickname ? nickname : event.getMessage().getAuthor().getName(),
+                        content);
             }
         }
     }
@@ -91,37 +94,12 @@ public class DiscordEventListener {
     @EventSubscriber
     public void onDisconnect(final DiscordDisconnectedEvent event) {
         plugin.getLogger().info("Bot got disconnected with reason " + event.getReason().name());
-        if (event.getReason() == DiscordDisconnectedEvent.Reason.LOGGED_OUT) {
-            return;
-        }
-
-        try {
-            reconnectTimer = new Timer();
-            reconnectTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (!event.getClient().isReady()) {
-                        try {
-                            event.getClient().login();
-                            plugin.getLogger().info("Logged in again after a timeout");
-                        } catch (DiscordException e) {
-                            plugin.getLogger().severe("Failed to relog to the Discord servers..");
-                            e.printStackTrace();
-                        }
-                    } else {
-                        reconnectTimer.cancel();
-                    }
-                }
-            }, (long) 2, RECONNECT_DELAY);
-        } catch (Exception e) {
-            e.printStackTrace();
-            plugin.getLogger().severe("There was a problem with reconnecting.. Please report the above stacktrace to the developer");
-        }
     }
 
     @EventSubscriber
     public void onReady(final ReadyEvent event) {
-        plugin.getLogger().info("Successfully logged in with '" + event.getClient().getOurUser().getName() + "'");
+        // Set game to Minecraft
+        DiscordMC.getClient().changeStatus(Status.game("Minecraft"));
 
         // Check for file encoder (emoji-related)
         switch (System.getProperty("file.encoding")) {

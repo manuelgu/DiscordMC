@@ -1,20 +1,26 @@
 # DiscordMC by manuelgu
-# https://manuelgu.eu
-#
 # https://www.spigotmc.org/resources/17067/
 settings:
   token: 'TOKEN_HERE'
-  channel: 'channelNameHere'
-  enable_discord_commands: true
-  command_prefix: '?'
   send_game_login: true
   send_game_logout: true
   send_game_chat: true
   send_discord_chat: true
   send_death_message: true
+  use_nicknames: false
   check_for_updates: true
   templates:
     chat_message_discord: '**%u**: %m'
-    player_join_minecraft: '%u joined the game'
-    player_leave_minecraft: '%u left the game'
-    chat_message_minecraft: '<&b(discord) &r%u> %m'
+    player_join_minecraft: '%user joined the game'
+    player_leave_minecraft: '%user left the game'
+    chat_message_minecraft: '&b(discord [%channel]) &r%user >> %message'
+  channels:
+    minecraft_to_discord:
+      - 'chatlog'
+      - 'chatting'
+    discord_to_minecraft:
+      - 'chatting'
+      - 'announcement'
+  discord_commands:
+    enabled: true
+    command_prefix: '?'

@@ -3,95 +3,92 @@ package eu.manuelgu.discordmc.listener;
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
 import eu.manuelgu.discordmc.update.Updater;
-
+import lombok.Getter;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class BukkitEventListener implements Listener {
-	private final DiscordMC plugin;
-	
-	public BukkitEventListener(DiscordMC plugin) {
-		this.plugin = plugin;
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onChat(AsyncPlayerChatEvent event) {
-		if (!plugin.getConfig().getBoolean("settings.send_game_chat")) {
-			return;
-		}
-		if (!event.getPlayer().hasPermission("discordmc.chat")) {
-			return;
-		}
-		
-		final String username = event.getPlayer().getName();
-		final String message = event.getMessage();
+    @Getter
+    private final DiscordMC plugin;
 
-		final String formattedMessage = plugin.getConfig().getString("settings.templates.chat_message_discord")
-				.replaceAll("%u", username)
-				.replaceAll("%m", message);
+    public BukkitEventListener(DiscordMC plugin) {
+        this.plugin = plugin;
+    }
 
-        MessageAPI.sendToDiscord(formattedMessage);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (!plugin.getConfig().getBoolean("settings.send_game_login")) {
-			return;
-		}
-        if (!event.getPlayer().hasPermission("discordmc.chat")) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!getPlugin().getConfig().getBoolean("settings.send_game_login")) {
             return;
         }
-		
-		final String username = event.getPlayer().getName();
-		final String formattedMessage = plugin.getConfig().getString("settings.templates.player_join_minecraft")
-                .replaceAll("%u", username);
+        if (!hasChatPermission(event.getPlayer())) {
+            return;
+        } else {
+            // Add to cache
+            DiscordMC.getCachedHasChatPermission().add(event.getPlayer().getUniqueId());
+
+            // Add player as a permissive player
+            DiscordMC.getSubscribedPlayers().add(event.getPlayer().getUniqueId());
+        }
+        final String username = event.getPlayer().getName();
+        final String formattedMessage = getPlugin().getConfig().getString("settings.templates.player_join_minecraft")
+                .replaceAll("%user", username);
 
         MessageAPI.sendToDiscord(formattedMessage);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		if (!plugin.getConfig().getBoolean("settings.send_game_logout")) {
-			return;
-		}
-        if (!event.getPlayer().hasPermission("discordmc.chat")) {
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        if (!getPlugin().getConfig().getBoolean("settings.send_game_logout")) {
             return;
         }
-
-		final String username = event.getPlayer().getName();
-		final String formattedMessage = plugin.getConfig().getString("settings.templates.player_leave_minecraft")
-                .replaceAll("%u", username);
+        if (!DiscordMC.getCachedHasChatPermission().contains(event.getPlayer().getUniqueId())) {
+            return;
+        }
+        DiscordMC.getCachedHasChatPermission().remove(event.getPlayer().getUniqueId());
+        final String username = event.getPlayer().getName();
+        final String formattedMessage = getPlugin().getConfig().getString("settings.templates.player_leave_minecraft")
+                .replaceAll("%user", username);
 
         MessageAPI.sendToDiscord(formattedMessage);
-	}
+
+        // Remove player as a permissive player
+        DiscordMC.getSubscribedPlayers().remove(event.getPlayer().getUniqueId());
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (!plugin.getConfig().getBoolean("settings.send_death_message")) {
+        if (!getPlugin().getConfig().getBoolean("settings.send_death_message")) {
             return;
         }
-        if (!event.getEntity().hasPermission("discordmc.chat")) {
+        if (!isSubscribed(event.getEntity()) || !hasChatPermission(event.getEntity())) {
             return;
         }
-
         final String deathMessage = event.getDeathMessage();
 
         MessageAPI.sendToDiscord(deathMessage);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onJoin(PlayerJoinEvent event) {
-        if (!plugin.getConfig().getBoolean("settings.check_for_updates")) {
+    public void onAdminPlayerJoin(PlayerJoinEvent event) {
+        if (!getPlugin().getConfig().getBoolean("settings.check_for_updates")) {
             return;
         }
         if (!event.getPlayer().hasPermission("discordmc.admin")) {
             return;
         }
-        Updater.sendUpdateMessage(event.getPlayer().getUniqueId(), plugin);
+        Updater.sendUpdateMessage(event.getPlayer().getUniqueId(), getPlugin());
+    }
+
+    private boolean isSubscribed(Player player) {
+        return DiscordMC.getSubscribedPlayers().contains(player.getUniqueId());
+    }
+
+    private boolean hasChatPermission(Player player) {
+        return player.hasPermission("discordmc.chat");
     }
 }
