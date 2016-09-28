@@ -2,6 +2,7 @@ package eu.manuelgu.discordmc;
 
 import eu.manuelgu.discordmc.listener.BukkitEventListener;
 import eu.manuelgu.discordmc.listener.DiscordEventListener;
+import eu.manuelgu.discordmc.listener.ChatListener;
 import eu.manuelgu.discordmc.update.Updater;
 import gnu.trove.set.hash.THashSet;
 import lombok.Getter;
@@ -115,6 +116,7 @@ public class DiscordMC extends JavaPlugin {
 
         // Register bukkit listeners and commands
         getServer().getPluginManager().registerEvents(new BukkitEventListener(this), this);
+        getServer().getPluginManager().registerEvents(new ChatListener(this), this);
         getCommand("discord").setExecutor(new DiscordCommand());
 
         // Check for plugin updates
