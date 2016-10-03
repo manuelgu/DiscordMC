@@ -53,6 +53,10 @@ public class DiscordEventListener {
             }
         } else {
             if (relayChat) {
+                if (!DiscordMC.getDiscordToMinecraft().contains(event.getMessage().getChannel())) {
+                    return;
+                }
+                
                 String content = event.getMessage().getContent();
                 List<IUser> mentions = event.getMessage().getMentions();
                 List<IRole> roleMentions = event.getMessage().getRoleMentions();
