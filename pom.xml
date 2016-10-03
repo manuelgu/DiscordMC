@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.manuelgu</groupId>
     <artifactId>DiscordMC</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2</version>
     <name>DiscordMC</name>
     <description>A Discord to Minecraft Chat Gateway</description>
 
