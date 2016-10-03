@@ -10,7 +10,7 @@ settings:
   use_nicknames: false
   check_for_updates: true
   templates:
-    chat_message_discord: '**%u**: %m'
+    chat_message_discord: '**%user**: %message'
     player_join_minecraft: '%user joined the game'
     player_leave_minecraft: '%user left the game'
     chat_message_minecraft: '&b(discord [%channel]) &r%user >> %message'
