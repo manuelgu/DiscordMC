@@ -1,8 +1,8 @@
 package eu.manuelgu.discordmc;
 
 import eu.manuelgu.discordmc.listener.BukkitEventListener;
-import eu.manuelgu.discordmc.listener.DiscordEventListener;
 import eu.manuelgu.discordmc.listener.ChatListener;
+import eu.manuelgu.discordmc.listener.DiscordEventListener;
 import eu.manuelgu.discordmc.update.Updater;
 import gnu.trove.set.hash.THashSet;
 import lombok.Getter;
