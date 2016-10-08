@@ -37,7 +37,7 @@ public class DiscordCommand implements CommandExecutor {
             case "logout":
             case "logoff":
                 cs.sendMessage("Command currently disabled.");
-                return;
+                break;
                 
                 if (!cs.hasPermission("discordmc.command.logout")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
@@ -57,7 +57,7 @@ public class DiscordCommand implements CommandExecutor {
             // Log in the client to Discord
             case "login":
                 cs.sendMessage("Command currently disabled.");
-                return;
+                break;
                 
                 if (!cs.hasPermission("discordmc.command.login")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
