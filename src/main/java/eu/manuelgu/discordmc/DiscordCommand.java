@@ -39,7 +39,7 @@ public class DiscordCommand implements CommandExecutor {
                 cs.sendMessage("Command currently disabled.");
                 break;
                 
-                if (!cs.hasPermission("discordmc.command.logout")) {
+                /*if (!cs.hasPermission("discordmc.command.logout")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
                     break;
                 }
@@ -53,13 +53,13 @@ public class DiscordCommand implements CommandExecutor {
                 } else {
                     cs.sendMessage(ChatColor.GREEN + "Done.");
                 }
-                break;
+                break;*/
             // Log in the client to Discord
             case "login":
                 cs.sendMessage("Command currently disabled.");
                 break;
                 
-                if (!cs.hasPermission("discordmc.command.login")) {
+                /*if (!cs.hasPermission("discordmc.command.login")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
                     break;
                 }
@@ -73,7 +73,7 @@ public class DiscordCommand implements CommandExecutor {
                 } else {
                     cs.sendMessage(ChatColor.GREEN + "Done.");
                 }
-                break;
+                break;*/
             case "lookup":
                 if (!cs.hasPermission("discordmc.command.lookup")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
