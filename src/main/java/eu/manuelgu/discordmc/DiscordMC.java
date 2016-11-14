@@ -7,6 +7,7 @@ import eu.manuelgu.discordmc.update.Updater;
 import gnu.trove.set.hash.THashSet;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
+import sx.blah.discord.Discord4J;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -102,6 +103,9 @@ public class DiscordMC extends JavaPlugin {
             e.printStackTrace();
             getLogger().severe("Failed to build client");
         }
+
+        // Disable audio
+        Discord4J.disableAudio();
 
         // Register listeners
         client.getDispatcher().registerListener(new DiscordEventListener(this));
