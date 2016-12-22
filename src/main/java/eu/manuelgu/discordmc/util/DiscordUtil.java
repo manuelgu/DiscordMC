@@ -19,7 +19,7 @@ public class DiscordUtil {
         try {
             client.logout();
             return true;
-        } catch (DiscordException | RateLimitException ignored) {
+        } catch (DiscordException ignored) {
             return false;
         }
     }
@@ -34,7 +34,7 @@ public class DiscordUtil {
         try {
             client.login();
             return true;
-        } catch (DiscordException ignored) {
+        } catch (DiscordException | RateLimitException ignored) {
             return false;
         }
     }

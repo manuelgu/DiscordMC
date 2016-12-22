@@ -116,6 +116,9 @@ public class DiscordMC extends JavaPlugin {
         } catch (DiscordException e) {
             e.printStackTrace();
             getLogger().severe("Failed to login");
+        } catch (RateLimitException e) {
+            e.printStackTrace();
+            getLogger().severe("Ratelimited while logging in");
         }
 
         // Register bukkit listeners and commands
@@ -137,7 +140,7 @@ public class DiscordMC extends JavaPlugin {
         }
         try {
             client.logout();
-        } catch (RateLimitException | DiscordException ignored) {
+        } catch (DiscordException ignored) {
             getLogger().warning("Could not logout");
         }
     }

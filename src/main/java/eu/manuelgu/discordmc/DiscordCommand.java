@@ -36,10 +36,7 @@ public class DiscordCommand implements CommandExecutor {
             // Log off the client from Discord
             case "logout":
             case "logoff":
-                cs.sendMessage("Command currently disabled.");
-                break;
-                
-                /*if (!cs.hasPermission("discordmc.command.logout")) {
+                if (!cs.hasPermission("discordmc.command.logout")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
                     break;
                 }
@@ -53,13 +50,10 @@ public class DiscordCommand implements CommandExecutor {
                 } else {
                     cs.sendMessage(ChatColor.GREEN + "Done.");
                 }
-                break;*/
+                break;
             // Log in the client to Discord
             case "login":
-                cs.sendMessage("Command currently disabled.");
-                break;
-                
-                /*if (!cs.hasPermission("discordmc.command.login")) {
+                if (!cs.hasPermission("discordmc.command.login")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
                     break;
                 }
@@ -73,7 +67,7 @@ public class DiscordCommand implements CommandExecutor {
                 } else {
                     cs.sendMessage(ChatColor.GREEN + "Done.");
                 }
-                break;*/
+                break;
             case "lookup":
                 if (!cs.hasPermission("discordmc.command.lookup")) {
                     cs.sendMessage(ChatColor.RED + LACKING_PERMISSION);
@@ -239,7 +233,7 @@ public class DiscordCommand implements CommandExecutor {
         b.append("guilds:");
         for (IGuild guild : DiscordMC.getClient().getGuilds()) {
             String guildName = guild.getName();
-            b.append("\n  ").append("\'" + guildName + "\'");
+            b.append("\n  ").append("\'").append(guildName).append("\'");
         }
         b.append("\nbotName: ").append(DiscordMC.getClient().getOurUser().getName()).append('\n');
         b.append("channels:\n");
