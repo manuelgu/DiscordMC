@@ -53,7 +53,7 @@ public class MessageAPI {
         if (!DiscordMC.getClient().isReady()) {
             return;
         }
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> DiscordMC.getMinecraftToDiscord().forEach(channel -> sendToDiscord(channel, message)));
+        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> DiscordMC.getMinecraftToDiscord().forEach(channel -> sendToDiscord(channel, ChatColor.stripColor(message))));
     }
 
     /**
@@ -65,7 +65,7 @@ public class MessageAPI {
     public static void sendToDiscord(IChannel channel, String message) {
         RequestBuffer.request(() -> {
             try {
-                new MessageBuilder(DiscordMC.getClient()).appendContent(message).withChannel(channel).build();
+                new MessageBuilder(DiscordMC.getClient()).appendContent(ChatColor.stripColor(message)).withChannel(channel).build();
             } catch (DiscordException ignored) {
             } catch (MissingPermissionsException e) {
                 plugin.getLogger().severe("Your Bot is missing required permissions to perform this action! "
