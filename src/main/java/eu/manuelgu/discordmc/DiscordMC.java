@@ -74,9 +74,6 @@ public class DiscordMC extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        // Disable Discord4j logging
-        ((Discord4J.Discord4JLogger) Discord4J.LOGGER).setLevel(Discord4J.Discord4JLogger.Level.INFO);
-
         // Disable all modules
         Configuration.LOAD_EXTERNAL_MODULES = false;
         Configuration.AUTOMATICALLY_ENABLE_MODULES = false;
