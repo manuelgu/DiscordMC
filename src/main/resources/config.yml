@@ -8,6 +8,7 @@ settings:
   send_discord_chat: true
   send_death_message: true
   use_nicknames: false
+  use_mentions: true
   check_for_updates: true
   templates:
     chat_message_discord: '**%user**: %message'
