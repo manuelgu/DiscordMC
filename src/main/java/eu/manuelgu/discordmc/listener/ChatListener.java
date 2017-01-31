@@ -22,8 +22,12 @@ public class ChatListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
         if (!getPlugin().getConfig().getBoolean("settings.send_game_chat")) {
             return;
         }
