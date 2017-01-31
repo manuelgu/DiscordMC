@@ -27,7 +27,7 @@ public class ChatListener implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        
+
         if (!getPlugin().getConfig().getBoolean("settings.send_game_chat")) {
             return;
         }
