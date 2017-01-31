@@ -6,7 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.IRole;
@@ -96,12 +95,7 @@ public class DiscordEventListener {
     }
 
     @EventSubscriber
-    public void onDisconnect(final DiscordDisconnectedEvent event) {
-        plugin.getLogger().info("Bot got disconnected with reason " + event.getReason().name());
-    }
-
-    @EventSubscriber
-    public void onReady(final ReadyEvent event) {
+    public void onReady(ReadyEvent event) {
         // Set game to Minecraft
         DiscordMC.getClient().changeStatus(Status.game("Minecraft"));
 
@@ -113,6 +107,11 @@ public class DiscordEventListener {
             default:
                 plugin.getLogger().warning("WARNING ::: Your file encoder is set to something else than UTF-8. This might break emoji encoding");
                 break;
+        }
+
+        if (event.getClient().getGuilds().size() == 0) {
+            plugin.getLogger().warning("Your bot is not joined to any guild. Please follow the instructions on the Spigot page");
+            DiscordMC.get().getServer().getPluginManager().disablePlugin(DiscordMC.get());
         }
     }
 }
