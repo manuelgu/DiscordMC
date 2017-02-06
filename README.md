@@ -4,9 +4,6 @@ DiscordMC is a plugin for [Spigot](https://spigotmc.org) which allows you to sen
 ## Spigot page
 https://www.spigotmc.org/resources/17067/
 
-## IRC
-Meet us on `irc.esper.net` in channel `#manuelgu` or use the [webchat through browser here](http://webchat.esper.net/?nick=&channels=manuelgu)
-
 ## Dependencies
 This plugins uses [Discord4j](https://github.com/austinv11/Discord4J) to interact with Discord
 
