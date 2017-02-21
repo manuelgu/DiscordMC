@@ -66,7 +66,9 @@ public class MessageAPI {
         RequestBuffer.request(() -> {
             try {
                 new MessageBuilder(DiscordMC.getClient()).appendContent(ChatColor.stripColor(message)).withChannel(channel).build();
-            } catch (DiscordException ignored) {
+            } catch (DiscordException e) {
+                plugin.getLogger().severe("Critical issue while sending message.. See stacktrace below");
+                e.printStackTrace();
             } catch (MissingPermissionsException e) {
                 plugin.getLogger().severe("Your Bot is missing required permissions to perform this action! "
                         + e.getErrorMessage());

@@ -235,7 +235,11 @@ public class DiscordCommand implements CommandExecutor {
             String guildName = guild.getName();
             b.append("\n  ").append("\'").append(guildName).append("\'");
         }
-        b.append("\nbotName: ").append(DiscordMC.getClient().getOurUser().getName()).append('\n');
+        if (DiscordMC.getClient().getOurUser() != null) {
+            b.append("\nbotName: ").append(DiscordMC.getClient().getOurUser().getName()).append('\n');
+        } else {
+            b.append("\nbotName: ").append("{NO USER CREATED}").append('\n');
+        }
         b.append("channels:\n");
         b.append("  minecraftToDiscord: ").append(StringUtils.join(
                 DiscordMC.getMinecraftToDiscord().stream().map(IChannel::getName).collect(Collectors.toList()), ", ")).append('\n');
