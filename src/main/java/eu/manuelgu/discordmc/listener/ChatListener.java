@@ -1,19 +1,24 @@
 package eu.manuelgu.discordmc.listener;
 
-import eu.manuelgu.discordmc.DiscordMC;
-import eu.manuelgu.discordmc.MessageAPI;
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+
+import eu.manuelgu.discordmc.DiscordMC;
+import eu.manuelgu.discordmc.MessageAPI;
+import lombok.Getter;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class ChatListener implements Listener {
     @Getter
