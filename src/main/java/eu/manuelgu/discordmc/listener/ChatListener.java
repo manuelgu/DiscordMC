@@ -1,25 +1,31 @@
 package eu.manuelgu.discordmc.listener;
 
-import eu.manuelgu.discordmc.DiscordMC;
-import eu.manuelgu.discordmc.MessageAPI;
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import sx.blah.discord.handle.obj.IUser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import eu.manuelgu.discordmc.DiscordMC;
+import eu.manuelgu.discordmc.MessageAPI;
+import lombok.Getter;
+import sx.blah.discord.handle.obj.IUser;
 
 public class ChatListener implements Listener {
     @Getter
     private final DiscordMC plugin;
+    private final Boolean useIngameFormat;
+    private final String adminChatPrefix;
 
     public ChatListener(DiscordMC plugin) {
         this.plugin = plugin;
+        this.useIngameFormat = getPlugin().getConfig().getBoolean("settings.use_ingame_format", true);
+        this.adminChatPrefix = getPlugin().getConfig().getString("settings.admin_chat_prefix", "§cAdminChat>");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -37,9 +43,25 @@ public class ChatListener implements Listener {
         final String username = event.getPlayer().getName();
         final String message = event.getMessage();
 
-        String formattedMessage = getPlugin().getConfig().getString("settings.templates.chat_message_discord")
-                .replaceAll("%user", username)
-                .replaceAll("%message", message);
+        if (event.getFormat().startsWith(adminChatPrefix)) {
+            return;
+        }
+
+        String formattedMessage;
+
+        if (useIngameFormat && !Objects.equals(DiscordMC.getUserFormats().get(event.getPlayer().getDisplayName()), event.getFormat())) {
+            DiscordMC.getUserFormats().set(event.getPlayer().getDisplayName(), event.getFormat());
+            DiscordMC.saveUserFormats();
+        }
+        String format = DiscordMC.getUserFormats().getString(username, "-");
+        if (!useIngameFormat || Objects.equals(format, "-")) {
+            formattedMessage = getPlugin().getConfig().getString("settings.templates.chat_message_discord")
+                    .replaceAll("%user", username)
+                    .replaceAll("%message", message);
+        } else {
+            formattedMessage = format.replace("%1$s", "**" + username + "**").replace("%2$s", message);
+        }
+
 
         if (getPlugin().getConfig().getBoolean("settings.use_mentions", true)) {
             List<String> mentionNames = new ArrayList<>();

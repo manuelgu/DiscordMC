@@ -1,21 +1,21 @@
 package eu.manuelgu.discordmc.listener;
 
-import eu.manuelgu.discordmc.DiscordMC;
-import eu.manuelgu.discordmc.MessageAPI;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import eu.manuelgu.discordmc.DiscordMC;
+import eu.manuelgu.discordmc.MessageAPI;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Status;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class DiscordEventListener {
     private final DiscordMC plugin;
@@ -26,10 +26,10 @@ public class DiscordEventListener {
 
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
-        relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat");
-        commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled");
-        useNickname = plugin.getConfig().getBoolean("settings.use_nicknames");
-        commandPrefix = plugin.getConfig().getString("settings.discord_commands.command_prefix");
+        relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat", true);
+        commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled", true);
+        useNickname = plugin.getConfig().getBoolean("settings.use_nicknames", true);
+        commandPrefix = plugin.getConfig().getString("settings.discord_commands.command_prefix", "?");
     }
 
     @EventSubscriber
@@ -77,19 +77,15 @@ public class DiscordEventListener {
                     content = content.replaceAll("<@&" + roleId + ">", "@" + roleName);
                 }
 
-                String nickname = null;
-                if (useNickname && event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild()).isPresent()) {
-                    Optional<String> nick = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild());
-                    if (nick.isPresent()) {
-                        nickname = nick.get();
-                    }
+                final String finalContent = content;
+                final String nickname;
+                if (useNickname) {
+                    nickname = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild())
+                            .orElseGet(() -> event.getMessage().getAuthor().getName());
                 } else {
-                    useNickname = false;
+                    nickname = event.getMessage().getAuthor().getName();
                 }
-
-                MessageAPI.sendToMinecraft(event.getMessage().getChannel(),
-                        useNickname ? nickname : event.getMessage().getAuthor().getName(),
-                        content);
+                MessageAPI.sendToMinecraft(event.getMessage().getChannel(), nickname, finalContent);
             }
         }
     }
