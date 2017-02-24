@@ -19,17 +19,19 @@ import sx.blah.discord.handle.obj.Status;
 
 public class DiscordEventListener {
     private final DiscordMC plugin;
-    private boolean relayChat;
-    private boolean commands;
-    private boolean useNickname;
-    private String commandPrefix;
+    private final boolean relayChat;
+    private final boolean sendToConsole;
+    private final boolean commands;
+    private final boolean useNickname;
+    private final String commandPrefix;
 
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
-        relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat", true);
-        commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled", true);
-        useNickname = plugin.getConfig().getBoolean("settings.use_nicknames", true);
-        commandPrefix = plugin.getConfig().getString("settings.discord_commands.command_prefix", "?");
+        this.relayChat = plugin.getConfig().getBoolean("settings.send_discord_chat", true);
+        this.commands = plugin.getConfig().getBoolean("settings.discord_commands.enabled", true);
+        this.useNickname = plugin.getConfig().getBoolean("settings.use_nicknames", true);
+        this.commandPrefix = plugin.getConfig().getString("settings.discord_commands.command_prefix", "?");
+        this.sendToConsole = plugin.getConfig().getBoolean("settings.send_game_chat_also_to_console", true);
     }
 
     @EventSubscriber
@@ -86,6 +88,10 @@ public class DiscordEventListener {
                     nickname = event.getMessage().getAuthor().getName();
                 }
                 MessageAPI.sendToMinecraft(event.getMessage().getChannel(), nickname, finalContent);
+
+                if (sendToConsole) {
+                    MessageAPI.sendToMinecraftConsole(event.getMessage().getChannel(), nickname, finalContent);
+                }
             }
         }
     }

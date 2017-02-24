@@ -29,6 +29,28 @@ public class MessageAPI {
      * @param message  the actual message which gets sent
      */
     public static void sendToMinecraft(IChannel origin, String username, String message) {
+        String formattedMessage = getFormattedMessage(origin, username);
+
+        DiscordMC.getSubscribedPlayers().forEach(uuid -> Bukkit.getPlayer(uuid).sendMessage(
+                EmojiParser.parseToAliases(formattedMessage
+                        .replaceAll("%message", ChatColor.stripColor(message)))));
+    }
+
+    /**
+     * Send a chat message to the Minecraft server console
+     *
+     * @param origin   {@link IChannel} the message came from
+     * @param username player who sent the message
+     * @param message  the actual message which gets sent
+     */
+    public static void sendToMinecraftConsole(IChannel origin, String username, String message) {
+        String formattedMessage = getFormattedMessage(origin, username);
+
+        Bukkit.getConsoleSender().sendMessage(
+                EmojiParser.parseToAliases(formattedMessage.replaceAll("%message", ChatColor.stripColor(message))));
+    }
+
+    private static String getFormattedMessage(final IChannel origin, final String username) {
         String format = (String) DiscordMC.getUserFormats().get(username, "-");
         String formattedMessage;
         if (!useIngameFormat || Objects.equals(format, "-")) {
@@ -39,11 +61,7 @@ public class MessageAPI {
         } else {
             formattedMessage = format.replace("%1$s", username).replace("%2$s", "%message");
         }
-
-
-        DiscordMC.getSubscribedPlayers().forEach(uuid -> Bukkit.getPlayer(uuid).sendMessage(
-                EmojiParser.parseToAliases(formattedMessage
-                        .replaceAll("%message", ChatColor.stripColor(message)))));
+        return formattedMessage;
     }
 
     /**
