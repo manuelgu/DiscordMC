@@ -22,9 +22,6 @@ public class BukkitEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        if (!getPlugin().getConfig().getBoolean("settings.send_game_login")) {
-            return;
-        }
         if (!hasChatPermission(event.getPlayer())) {
             return;
         } else {
@@ -33,6 +30,9 @@ public class BukkitEventListener implements Listener {
 
             // Add player as a permissive player
             DiscordMC.getSubscribedPlayers().add(event.getPlayer().getUniqueId());
+        }
+        if (!getPlugin().getConfig().getBoolean("settings.send_game_login")) {
+            return;
         }
         final String username = event.getPlayer().getName();
         final String formattedMessage = getPlugin().getConfig().getString("settings.templates.player_join_minecraft")
@@ -43,21 +43,20 @@ public class BukkitEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        if (!getPlugin().getConfig().getBoolean("settings.send_game_logout")) {
-            return;
-        }
+        // Remove player as a permissive player
+        DiscordMC.getSubscribedPlayers().remove(event.getPlayer().getUniqueId());
         if (!DiscordMC.getCachedHasChatPermission().contains(event.getPlayer().getUniqueId())) {
             return;
         }
         DiscordMC.getCachedHasChatPermission().remove(event.getPlayer().getUniqueId());
+        if (!getPlugin().getConfig().getBoolean("settings.send_game_logout")) {
+            return;
+        }
         final String username = event.getPlayer().getName();
         final String formattedMessage = getPlugin().getConfig().getString("settings.templates.player_leave_minecraft")
                 .replaceAll("%user", username);
 
         MessageAPI.sendToDiscord(formattedMessage);
-
-        // Remove player as a permissive player
-        DiscordMC.getSubscribedPlayers().remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
