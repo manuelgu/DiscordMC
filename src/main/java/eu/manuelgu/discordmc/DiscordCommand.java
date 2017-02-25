@@ -174,6 +174,7 @@ public class DiscordCommand implements CommandExecutor {
                     // toggled on
                     player.sendMessage(ChatColor.BLUE + "You have enabled the Discord module for yourself.");
                 }
+                break;
             default:
                 cs.sendMessage(ChatColor.RED + USAGE);
                 break;
