@@ -10,7 +10,7 @@ settings:
   send_death_message: true
   use_nicknames: false
   use_mentions: true
-  use_ingame_format: true
+  use_ingame_format: false
   check_for_updates: true
   admin_chat_prefix: "§cAdminChat>"
   templates:
