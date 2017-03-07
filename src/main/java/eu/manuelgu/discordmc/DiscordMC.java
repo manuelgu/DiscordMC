@@ -1,12 +1,22 @@
 package eu.manuelgu.discordmc;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import eu.manuelgu.discordmc.listener.BukkitEventListener;
 import eu.manuelgu.discordmc.listener.ChatListener;
 import eu.manuelgu.discordmc.listener.DiscordEventListener;
 import eu.manuelgu.discordmc.update.Updater;
 import gnu.trove.set.hash.THashSet;
 import lombok.Getter;
-import org.bukkit.plugin.java.JavaPlugin;
 import sx.blah.discord.Discord4J;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
@@ -17,13 +27,8 @@ import sx.blah.discord.modules.Configuration;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RateLimitException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 public class DiscordMC extends JavaPlugin {
-    public static DiscordMC instance;
+    private static DiscordMC instance;
 
     /**
      * Get the client instance
@@ -69,10 +74,28 @@ public class DiscordMC extends JavaPlugin {
         return instance;
     }
 
+    private static File userFormatsFile;
+
+    @Getter
+    private static YamlConfiguration userFormats;
+
     @Override
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
+
+        userFormatsFile = new File(getDataFolder(), "userFormats.yml");
+        userFormats = new YamlConfiguration();
+
+        if (userFormatsFile.exists()) {
+            loadUserFormats();
+        } else {
+            try {
+                userFormatsFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         // Disable all modules
         Configuration.LOAD_EXTERNAL_MODULES = false;
@@ -130,7 +153,6 @@ public class DiscordMC extends JavaPlugin {
         if (getConfig().getBoolean("settings.check_for_updates")) {
             Updater.sendUpdateMessage(this);
         }
-
     }
 
     @Override
@@ -168,4 +190,24 @@ public class DiscordMC extends JavaPlugin {
 
         getLogger().info("Successfully logged in with '" + event.getClient().getOurUser().getName() + "'");
     }
+
+    private static void loadUserFormats() {
+        try {
+            userFormats.load(userFormatsFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveUserFormats() {
+        try {
+            userFormatsFile.createNewFile();
+            userFormats.save(userFormatsFile);
+            loadUserFormats();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

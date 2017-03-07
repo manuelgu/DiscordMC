@@ -1,20 +1,23 @@
 package eu.manuelgu.discordmc;
 
-import com.vdurmont.emoji.EmojiParser;
+import java.util.List;
+import java.util.Objects;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+
+import com.vdurmont.emoji.EmojiParser;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MessageBuilder;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RequestBuffer;
 
-import java.util.List;
-
 public class MessageAPI {
     private static DiscordMC plugin;
+    private static final Boolean useIngameFormat = DiscordMC.get().getConfig().getBoolean("settings.use_ingame_format", true);
 
-    public MessageAPI(DiscordMC main) {
+    MessageAPI(DiscordMC main) {
         MessageAPI.plugin = main;
     }
 
@@ -26,13 +29,39 @@ public class MessageAPI {
      * @param message  the actual message which gets sent
      */
     public static void sendToMinecraft(IChannel origin, String username, String message) {
-        String formattedMessage = ChatColor.translateAlternateColorCodes('&', DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
-                .replace("%user", username)
-                .replace("%channel", origin.getName()));
+        String formattedMessage = getFormattedMessage(origin, username);
 
         DiscordMC.getSubscribedPlayers().forEach(uuid -> Bukkit.getPlayer(uuid).sendMessage(
                 EmojiParser.parseToAliases(formattedMessage
                         .replaceAll("%message", ChatColor.stripColor(message)))));
+    }
+
+    /**
+     * Send a chat message to the Minecraft server console
+     *
+     * @param origin   {@link IChannel} the message came from
+     * @param username player who sent the message
+     * @param message  the actual message which gets sent
+     */
+    public static void sendToMinecraftConsole(IChannel origin, String username, String message) {
+        String formattedMessage = getFormattedMessage(origin, username);
+
+        Bukkit.getConsoleSender().sendMessage(
+                EmojiParser.parseToAliases(formattedMessage.replaceAll("%message", ChatColor.stripColor(message))));
+    }
+
+    private static String getFormattedMessage(final IChannel origin, final String username) {
+        String format = (String) DiscordMC.getUserFormats().get(username, "-");
+        String formattedMessage;
+        if (!useIngameFormat || Objects.equals(format, "-")) {
+            formattedMessage =
+                    ChatColor.translateAlternateColorCodes('&', DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
+                            .replace("%user", username)
+                            .replace("%channel", origin.getName()));
+        } else {
+            formattedMessage = format.replace("%1$s", username).replace("%2$s", "%message");
+        }
+        return formattedMessage;
     }
 
     /**
@@ -62,7 +91,7 @@ public class MessageAPI {
      * @param channel channel to receive message
      * @param message message to send
      */
-    public static void sendToDiscord(IChannel channel, String message) {
+    static void sendToDiscord(IChannel channel, String message) {
         RequestBuffer.request(() -> {
             try {
                 new MessageBuilder(DiscordMC.getClient()).appendContent(ChatColor.stripColor(message)).withChannel(channel).build();
@@ -83,7 +112,7 @@ public class MessageAPI {
      * @param channels channels that receive message
      * @param message  message to send
      */
-    public static void sendToDiscord(List<IChannel> channels, String message) {
+    static void sendToDiscord(List<IChannel> channels, String message) {
         channels.forEach(channel -> sendToDiscord(channel, message));
     }
 }

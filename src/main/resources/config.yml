@@ -5,11 +5,14 @@ settings:
   send_game_login: true
   send_game_logout: true
   send_game_chat: true
+  send_game_chat_also_to_console: true
   send_discord_chat: true
   send_death_message: true
   use_nicknames: false
   use_mentions: true
+  use_ingame_format: true
   check_for_updates: true
+  admin_chat_prefix: "§cAdminChat>"
   templates:
     chat_message_discord: '**%user**: %message'
     player_join_minecraft: '%user joined the game'
