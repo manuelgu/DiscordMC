@@ -115,17 +115,11 @@
             <version>1.16.12</version>
             <scope>provided</scope>
         </dependency>
-        <!--EmojiJava-->
-        <dependency>
-            <groupId>com.vdurmont</groupId>
-            <artifactId>emoji-java</artifactId>
-            <version>3.1.1</version>
-        </dependency>
         <!--Discord4j-->
         <dependency>
             <groupId>com.github.austinv11</groupId>
             <artifactId>Discord4j</artifactId>
-            <version>2.7.0</version>
+            <version>326fa03</version>
             <classifier>shaded</classifier>
         </dependency>
         <!--Logback-->
