@@ -1,5 +1,7 @@
 package eu.manuelgu.discordmc.listener;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -53,11 +55,8 @@ public class DiscordEventListener {
                     break;
             }
         } else {
-            if (relayChat) {
-                if (!DiscordMC.getDiscordToMinecraft().contains(event.getMessage().getChannel())) {
-                    return;
-                }
-                
+            if (relayChat && (DiscordMC.getDiscordToMinecraft().contains(event.getMessage().getChannel())
+                    || DiscordMC.getNews().contains(event.getMessage().getChannel()))) {
                 String content = event.getMessage().getContent();
                 List<IUser> mentions = event.getMessage().getMentions();
                 List<IRole> roleMentions = event.getMessage().getRoleMentions();
@@ -87,10 +86,23 @@ public class DiscordEventListener {
                 } else {
                     nickname = event.getMessage().getAuthor().getName();
                 }
-                MessageAPI.sendToMinecraft(event.getMessage().getChannel(), nickname, finalContent);
+                if (DiscordMC.getDiscordToMinecraft().contains(event.getMessage().getChannel())) {
+                    MessageAPI.sendToMinecraft(event.getMessage().getChannel(), nickname, finalContent);
 
-                if (sendToConsole) {
-                    MessageAPI.sendToMinecraftConsole(event.getMessage().getChannel(), nickname, finalContent);
+                    if (sendToConsole) {
+                        MessageAPI.sendToMinecraftConsole(event.getMessage().getChannel(), nickname, finalContent);
+                    }
+                }
+                if (DiscordMC.getNews().contains(event.getMessage().getChannel())) {
+                    try {
+                        Statement statement = DiscordMC.getConnection().createStatement();
+                        String query = "INSERT INTO `DiscordMC_news`(`message`, `user`) " +
+                                "VALUES ('" + finalContent + "','" + nickname + "')";
+                        statement.execute(query);
+                        statement.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

@@ -25,6 +25,15 @@ settings:
     discord_to_minecraft:
       - 'chatting'
       - 'announcement'
+    news:
+      - 'news'
   discord_commands:
     enabled: true
     command_prefix: '?'
+  mysql:
+    enabled: false
+    ip: localhost
+    port: 3306
+    database: database
+    username: username
+    password: password
