@@ -2,7 +2,6 @@ package eu.manuelgu.discordmc;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,8 +15,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import eu.manuelgu.discordmc.listener.BukkitEventListener;
 import eu.manuelgu.discordmc.listener.ChatListener;
 import eu.manuelgu.discordmc.listener.DiscordEventListener;
@@ -28,8 +25,9 @@ import sx.blah.discord.Discord4J;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.GuildCreateEvent;
+import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.modules.Configuration;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RateLimitException;
@@ -72,6 +70,9 @@ public class DiscordMC extends JavaPlugin {
      */
     @Getter
     private static Set<UUID> subscribedPlayers;
+
+    @Getter
+    private static IGuild guild;
 
     /**
      * If token was valid or not
@@ -177,7 +178,7 @@ public class DiscordMC extends JavaPlugin {
                                 + getConfig().getString("settings.mysql.ip") + ":"
                                 + getConfig().getString("settings.mysql.port") + "/"
                                 + getConfig().getString("settings.mysql.database")
-                                + "?characterEncoding=UTF-8",
+                                + "?characterEncoding=UTF-8&autoReconnect=true",
                         getConfig().getString("settings.mysql.username"),
                         getConfig().getString("settings.mysql.password", null));
                 getLogger().info("Connection created");
@@ -230,6 +231,8 @@ public class DiscordMC extends JavaPlugin {
                 news.add(channel);
             }
         }
+
+        guild = event.getGuild();
 
         getLogger().info("Successfully logged in with '" + event.getClient().getOurUser().getName() + "'");
     }

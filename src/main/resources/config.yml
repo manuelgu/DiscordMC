@@ -12,12 +12,19 @@ settings:
   use_mentions: true
   use_ingame_format: false
   check_for_updates: true
-  admin_chat_prefix: "§cAdminChat>"
+  show_discord_users_in_tablist: false
+  admin_chat_prefix: '§cAdminChat>'
+  discord_admin_role: 'Admin'
+  show_in_tablist_discord_roles:
+    - 'Admin'
+    - 'Player'
   templates:
     chat_message_discord: '**%user**: %message'
     player_join_minecraft: '%user joined the game'
     player_leave_minecraft: '%user left the game'
     chat_message_minecraft: '&b(discord [%channel]) &r%user >> %message'
+    tablist_player_prefix: '§7D '
+    tablist_admin_prefix: '§6D '
   channels:
     minecraft_to_discord:
       - 'chatlog'

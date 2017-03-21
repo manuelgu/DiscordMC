@@ -2,22 +2,38 @@ package eu.manuelgu.discordmc.listener;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_11_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import com.mojang.authlib.GameProfile;
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
+import net.minecraft.server.v1_11_R1.EntityPlayer;
+import net.minecraft.server.v1_11_R1.MinecraftServer;
+import net.minecraft.server.v1_11_R1.PacketPlayOutPlayerInfo;
+import net.minecraft.server.v1_11_R1.PlayerConnection;
+import net.minecraft.server.v1_11_R1.PlayerInteractManager;
+import net.minecraft.server.v1_11_R1.WorldServer;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.impl.events.user.PresenceUpdateEvent;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Status;
+import sx.blah.discord.handle.obj.StatusType;
 
 public class DiscordEventListener {
     private final DiscordMC plugin;
@@ -25,7 +41,12 @@ public class DiscordEventListener {
     private final boolean sendToConsole;
     private final boolean commands;
     private final boolean useNickname;
+    private final boolean showDiscordUsersInTablist;
+    private final String tablistPlayerPrefix;
+    private final String tablistAdminPrefix;
+    private final String discordAdminRole;
     private final String commandPrefix;
+    private final List<String> roles;
 
     public DiscordEventListener(DiscordMC plugin) {
         this.plugin = plugin;
@@ -34,6 +55,11 @@ public class DiscordEventListener {
         this.useNickname = plugin.getConfig().getBoolean("settings.use_nicknames", true);
         this.commandPrefix = plugin.getConfig().getString("settings.discord_commands.command_prefix", "?");
         this.sendToConsole = plugin.getConfig().getBoolean("settings.send_game_chat_also_to_console", true);
+        this.discordAdminRole = plugin.getConfig().getString("settings.discord_admin_role", "Admin");
+        this.tablistAdminPrefix = plugin.getConfig().getString("settings.templates.tablist_player_prefix", "§6D ");
+        this.tablistPlayerPrefix = plugin.getConfig().getString("settings.templates.tablist_admin_prefix", "§7D ");
+        this.roles = (List<String>) plugin.getConfig().getList("settings.show_in_tablist_discord_roles");
+        this.showDiscordUsersInTablist = plugin.getConfig().getBoolean("settings.show_discord_users_in_tablist", false);
     }
 
     @EventSubscriber
@@ -126,6 +152,59 @@ public class DiscordEventListener {
         if (event.getClient().getGuilds().size() == 0) {
             plugin.getLogger().warning("Your bot is not joined to any guild. Please follow the instructions on the Spigot page");
             DiscordMC.get().getServer().getPluginManager().disablePlugin(DiscordMC.get());
+        }
+    }
+
+    @EventSubscriber
+    public void onPresenceUpdate(PresenceUpdateEvent event) {
+        if (showDiscordUsersInTablist) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Set<String> eventRoles = event
+                            .getUser()
+                            .getRolesForGuild(DiscordMC.getGuild())
+                            .stream()
+                            .map(IRole::getName)
+                            .collect(Collectors.toSet());
+                    if (Collections.disjoint(roles, eventRoles)) {
+                        return;
+                    }
+
+                    MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
+                    WorldServer world = ((CraftWorld) Bukkit.getWorlds().get(0)).getHandle();
+
+                    final String prefix;
+
+                    if (eventRoles.contains(discordAdminRole)) {
+                        prefix = tablistAdminPrefix;
+                    } else {
+                        prefix = tablistPlayerPrefix;
+                    }
+
+                    String s = prefix + event.getUser().getNicknameForGuild(DiscordMC.getGuild()).orElseGet(event.getUser()::getName);
+                    s = s.substring(0, Math.min(s.length(), 18));
+                    GameProfile profile = new GameProfile(UUID.randomUUID(), s);
+
+                    PlayerInteractManager manager = new PlayerInteractManager(world);
+
+                    EntityPlayer npc = new EntityPlayer(server, world, profile, manager);
+
+                    final PacketPlayOutPlayerInfo info;
+                    if (event.getNewPresence().getStatus() == StatusType.OFFLINE) {
+                        info = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, npc);
+                    } else if (event.getOldPresence().getStatus() == StatusType.OFFLINE) {
+                        info = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc);
+                    } else {
+                        return;
+                    }
+
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+                        connection.sendPacket(info);
+                    });
+                }
+            }.runTaskAsynchronously(plugin);
         }
     }
 }
