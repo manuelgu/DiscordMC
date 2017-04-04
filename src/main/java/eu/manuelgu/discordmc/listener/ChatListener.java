@@ -27,7 +27,7 @@ public class ChatListener implements Listener {
         this.adminChatPrefix = getPlugin().getConfig().getString("settings.admin_chat_prefix", "§cAdminChat>");
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         if (event.isCancelled()) {
             return;
