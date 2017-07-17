@@ -82,7 +82,9 @@ public class ChatListener implements Listener {
             }
         }
 
-        MessageAPI.sendToDiscord(formattedMessage);
+        if (!formattedMessage.isEmpty()) {
+            MessageAPI.sendToDiscord(formattedMessage);
+        }
     }
 
     private boolean isSubscribed(Player player) {

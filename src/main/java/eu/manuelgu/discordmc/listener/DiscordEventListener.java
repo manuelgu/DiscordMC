@@ -1,5 +1,7 @@
 package eu.manuelgu.discordmc.listener;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
@@ -11,21 +13,21 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_11_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.mojang.authlib.GameProfile;
 import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
-import net.minecraft.server.v1_11_R1.EntityPlayer;
-import net.minecraft.server.v1_11_R1.MinecraftServer;
-import net.minecraft.server.v1_11_R1.PacketPlayOutPlayerInfo;
-import net.minecraft.server.v1_11_R1.PlayerConnection;
-import net.minecraft.server.v1_11_R1.PlayerInteractManager;
-import net.minecraft.server.v1_11_R1.WorldServer;
+import net.minecraft.server.v1_12_R1.EntityPlayer;
+import net.minecraft.server.v1_12_R1.MinecraftServer;
+import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
+import net.minecraft.server.v1_12_R1.PlayerInteractManager;
+import net.minecraft.server.v1_12_R1.WorldServer;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
@@ -71,7 +73,11 @@ public class DiscordEventListener {
                     MessageAPI.sendToDiscord("Available commands: list");
                     break;
                 case "list":
-                    List<String> online = Bukkit.getOnlinePlayers().stream().map((Function<Player, String>) Player::getName).collect(Collectors.toList());
+                    List<String> online = Bukkit
+                            .getOnlinePlayers()
+                            .stream()
+                            .map((Function<Player, String>) Player::getName)
+                            .collect(Collectors.toList());
 
                     MessageAPI.sendToDiscord("There are " + online.size() + "/"
                             + Bukkit.getMaxPlayers() + " players online:"
@@ -120,15 +126,29 @@ public class DiscordEventListener {
                     }
                 }
                 if (DiscordMC.getNews().contains(event.getMessage().getChannel())) {
-                    try {
-                        Statement statement = DiscordMC.getConnection().createStatement();
-                        String query = "INSERT INTO `DiscordMC_news`(`message`, `user`) " +
-                                "VALUES ('" + finalContent + "','" + nickname + "')";
-                        statement.execute(query);
-                        statement.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try (Connection connection = DriverManager.getConnection("jdbc:mysql://"
+                                            + DiscordMC.get().getConfig().getString("settings.mysql.ip") + ":"
+                                            + DiscordMC.get().getConfig().getString("settings.mysql.port") + "/"
+                                            + DiscordMC.get().getConfig().getString("settings.mysql.database")
+                                            + "?characterEncoding=UTF-8&autoReconnect=true",
+                                    DiscordMC.get().getConfig().getString("settings.mysql.username"),
+                                    DiscordMC
+                                            .get()
+                                            .getConfig()
+                                            .getString("settings.mysql.password", null));
+                                 Statement statement = connection.createStatement()) {
+                                DiscordMC.get().getLogger().info("Connection created");
+                                String query = "INSERT INTO `DiscordMC_news`(`message`, `user`) " +
+                                        "VALUES ('" + finalContent + "','" + nickname + "')";
+                                statement.execute(query);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }.runTaskAsynchronously(plugin);
                 }
             }
         }

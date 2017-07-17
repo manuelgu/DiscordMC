@@ -293,6 +293,8 @@ public class DiscordMC extends JavaPlugin {
             if (statement != null && !statement.isClosed()) {
                 statement.close();
             }
+
+            connection.close();
         }
     }
 }
