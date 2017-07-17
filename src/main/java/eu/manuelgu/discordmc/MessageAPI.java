@@ -24,9 +24,9 @@ public class MessageAPI {
     /**
      * Send a chat message to the Minecraft server
      *
-     * @param origin   {@link IChannel} the message came from
+     * @param origin {@link IChannel} the message came from
      * @param username player who sent the message
-     * @param message  the actual message which gets sent
+     * @param message the actual message which gets sent
      */
     public static void sendToMinecraft(IChannel origin, String username, String message) {
         String formattedMessage = getFormattedMessage(origin, username);
@@ -39,9 +39,9 @@ public class MessageAPI {
     /**
      * Send a chat message to the Minecraft server console
      *
-     * @param origin   {@link IChannel} the message came from
+     * @param origin {@link IChannel} the message came from
      * @param username player who sent the message
-     * @param message  the actual message which gets sent
+     * @param message the actual message which gets sent
      */
     public static void sendToMinecraftConsole(IChannel origin, String username, String message) {
         String formattedMessage = getFormattedMessage(origin, username);
@@ -55,9 +55,10 @@ public class MessageAPI {
         String formattedMessage;
         if (!useIngameFormat || Objects.equals(format, "-")) {
             formattedMessage =
-                    ChatColor.translateAlternateColorCodes('&', DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
-                            .replace("%user", username)
-                            .replace("%channel", origin.getName()));
+                    ChatColor.translateAlternateColorCodes('&',
+                            DiscordMC.get().getConfig().getString("settings.templates.chat_message_minecraft")
+                                    .replace("%user", username)
+                                    .replace("%channel", origin.getName()));
         } else {
             formattedMessage = format.replace("%1$s", username).replace("%2$s", "%message");
         }
@@ -82,7 +83,10 @@ public class MessageAPI {
         if (!DiscordMC.getClient().isReady()) {
             return;
         }
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> DiscordMC.getMinecraftToDiscord().forEach(channel -> sendToDiscord(channel, ChatColor.stripColor(message))));
+        if (!ChatColor.stripColor(message).isEmpty()) {
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin,
+                    () -> DiscordMC.getMinecraftToDiscord().forEach(channel -> sendToDiscord(channel, ChatColor.stripColor(message))));
+        }
     }
 
     /**
@@ -110,7 +114,7 @@ public class MessageAPI {
      * Send a message to a list of specific channels
      *
      * @param channels channels that receive message
-     * @param message  message to send
+     * @param message message to send
      */
     static void sendToDiscord(List<IChannel> channels, String message) {
         channels.forEach(channel -> sendToDiscord(channel, message));
