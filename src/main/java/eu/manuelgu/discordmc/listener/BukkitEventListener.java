@@ -87,7 +87,7 @@ public class BukkitEventListener implements Listener {
                                 }
 
                                 String s = prefix + user.getNicknameForGuild(DiscordMC.getGuild()).orElseGet(user::getName);
-                                s = s.substring(0, Math.min(s.length(), 18));
+                                s = s.substring(0, Math.min(s.length(), 15));
                                 GameProfile profile = new GameProfile(UUID.randomUUID(), s);
                                 PlayerInteractManager manager = new PlayerInteractManager(world);
 
