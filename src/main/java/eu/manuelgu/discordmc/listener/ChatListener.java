@@ -1,19 +1,20 @@
 package eu.manuelgu.discordmc.listener;
 
-import eu.manuelgu.discordmc.DiscordMC;
-import eu.manuelgu.discordmc.MessageAPI;
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import sx.blah.discord.handle.obj.IUser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import eu.manuelgu.discordmc.DiscordMC;
+import eu.manuelgu.discordmc.MessageAPI;
+import lombok.Getter;
+import sx.blah.discord.handle.obj.IUser;
 
 public class ChatListener implements Listener {
     @Getter
@@ -71,13 +72,15 @@ public class ChatListener implements Listener {
                     List<IUser> users = DiscordMC.getClient().getGuilds().get(0).getUsersByName(s, true);
 
                     if (!users.isEmpty()) {
-                        formattedMessage = formattedMessage.replaceAll("@" + s, "<@" + users.get(0).getID() + ">");
+                        formattedMessage = formattedMessage.replaceAll("@" + s, "<@" + users.get(0).getStringID() + ">");
                     }
                 }
             }
         }
 
-        MessageAPI.sendToDiscord(formattedMessage);
+        if (!formattedMessage.isEmpty()) {
+            MessageAPI.sendToDiscord(formattedMessage);
+        }
     }
 
     private boolean isSubscribed(Player player) {

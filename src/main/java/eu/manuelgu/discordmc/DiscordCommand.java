@@ -1,7 +1,11 @@
 package eu.manuelgu.discordmc;
 
-import eu.manuelgu.discordmc.util.DiscordUtil;
-import eu.manuelgu.discordmc.util.HastebinUtility;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -11,17 +15,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import eu.manuelgu.discordmc.util.DiscordUtil;
+import eu.manuelgu.discordmc.util.HastebinUtility;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IPresence;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class DiscordCommand implements CommandExecutor {
     private final String USAGE = "Usage: /discord <logout|login|lookup|send|debug|toggle>";
@@ -91,7 +92,7 @@ public class DiscordCommand implements CommandExecutor {
                 String name = lookupUser[0].getName();
                 Optional<String> game = lookupUser[0].getPresence().getPlayingText();
                 boolean isBot = lookupUser[0].isBot();
-                String id = lookupUser[0].getID();
+                String id = lookupUser[0].getStringID();
                 List<IRole> roles = lookupUser[0].getRolesForGuild(DiscordMC.getClient().getGuilds().get(0));
                 String discriminator = lookupUser[0].getDiscriminator();
                 IPresence presences = lookupUser[0].getPresence();

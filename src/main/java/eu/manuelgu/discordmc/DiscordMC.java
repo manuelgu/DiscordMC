@@ -2,6 +2,10 @@ package eu.manuelgu.discordmc;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -21,8 +25,9 @@ import sx.blah.discord.Discord4J;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.GuildCreateEvent;
+import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.modules.Configuration;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RateLimitException;
@@ -49,6 +54,12 @@ public class DiscordMC extends JavaPlugin {
     private static List<IChannel> minecraftToDiscord;
 
     /**
+     * News channel
+     */
+    @Getter
+    private static List<IChannel> news;
+
+    /**
      * Players that have the permissions to use the plugin
      */
     @Getter
@@ -59,6 +70,9 @@ public class DiscordMC extends JavaPlugin {
      */
     @Getter
     private static Set<UUID> subscribedPlayers;
+
+    @Getter
+    private static IGuild guild;
 
     /**
      * If token was valid or not
@@ -78,6 +92,9 @@ public class DiscordMC extends JavaPlugin {
 
     @Getter
     private static YamlConfiguration userFormats;
+
+    @Getter
+    private static Connection connection;
 
     @Override
     public void onEnable() {
@@ -153,12 +170,34 @@ public class DiscordMC extends JavaPlugin {
         if (getConfig().getBoolean("settings.check_for_updates")) {
             Updater.sendUpdateMessage(this);
         }
+
+        if (getConfig().getBoolean("settings.mysql.enabled", false)) {
+            try {
+                getLogger().info("Connecting to database");
+                connection = DriverManager.getConnection("jdbc:mysql://"
+                                + getConfig().getString("settings.mysql.ip") + ":"
+                                + getConfig().getString("settings.mysql.port") + "/"
+                                + getConfig().getString("settings.mysql.database")
+                                + "?characterEncoding=UTF-8&autoReconnect=true",
+                        getConfig().getString("settings.mysql.username"),
+                        getConfig().getString("settings.mysql.password", null));
+                getLogger().info("Connection created");
+                createTables();
+            } catch (IOException | SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void onDisable() {
         if (!validToken) {
             return;
+        }
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         try {
             client.logout();
@@ -175,9 +214,11 @@ public class DiscordMC extends JavaPlugin {
 
         discordToMinecraft = new ArrayList<>();
         minecraftToDiscord = new ArrayList<>();
+        news = new ArrayList<>();
 
         List<String> dTm = getConfig().getStringList("settings.channels.discord_to_minecraft");
         List<String> mTd = getConfig().getStringList("settings.channels.minecraft_to_discord");
+        List<String> newsCh = getConfig().getStringList("settings.channels.news");
 
         for (IChannel channel : getClient().getChannels(false)) {
             if (dTm.contains(channel.getName())) {
@@ -186,7 +227,12 @@ public class DiscordMC extends JavaPlugin {
             if (mTd.contains(channel.getName())) {
                 minecraftToDiscord.add(channel);
             }
+            if (newsCh.contains(channel.getName())) {
+                news.add(channel);
+            }
         }
+
+        guild = event.getGuild();
 
         getLogger().info("Successfully logged in with '" + event.getClient().getOurUser().getName() + "'");
     }
@@ -209,5 +255,46 @@ public class DiscordMC extends JavaPlugin {
         }
     }
 
+    private void createTables() throws IOException, SQLException {
+        String[] databaseStructure = ("SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";\n" +
+                "SET time_zone = \"+00:00\";\n" +
+                "\n" +
+                "CREATE TABLE IF NOT EXISTS `DiscordMC_news` (\n" +
+                "  `id` int(11) NOT NULL AUTO_INCREMENT,\n" +
+                "  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n" +
+                "  `message` text COLLATE utf8_general_ci NOT NULL,\n" +
+                "  `user` text COLLATE utf8_general_ci NOT NULL,\n" +
+                "  PRIMARY KEY (`id`)\n" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=1 ;").split(";");
 
+        if (databaseStructure.length == 0) {
+            return;
+        }
+
+        Statement statement = null;
+
+        try {
+            connection.setAutoCommit(false);
+            statement = connection.createStatement();
+
+            for (String query : databaseStructure) {
+                query = query.trim();
+
+                if (query.isEmpty()) {
+                    continue;
+                }
+                statement.execute(query);
+            }
+            connection.commit();
+
+        } finally {
+            connection.setAutoCommit(true);
+
+            if (statement != null && !statement.isClosed()) {
+                statement.close();
+            }
+
+            connection.close();
+        }
+    }
 }
