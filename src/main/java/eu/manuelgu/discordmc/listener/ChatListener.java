@@ -16,10 +16,6 @@ import eu.manuelgu.discordmc.MessageAPI;
 import lombok.Getter;
 import sx.blah.discord.handle.obj.IUser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class ChatListener implements Listener {
     @Getter
     private final DiscordMC plugin;
@@ -76,7 +72,7 @@ public class ChatListener implements Listener {
                     List<IUser> users = DiscordMC.getClient().getGuilds().get(0).getUsersByName(s, true);
 
                     if (!users.isEmpty()) {
-                        formattedMessage = formattedMessage.replaceAll("@" + s, "<@" + users.get(0).getID() + ">");
+                        formattedMessage = formattedMessage.replaceAll("@" + s, "<@" + users.get(0).getStringID() + ">");
                     }
                 }
             }

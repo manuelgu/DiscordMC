@@ -1,5 +1,8 @@
 package eu.manuelgu.discordmc.util;
 
+import java.util.logging.Level;
+
+import eu.manuelgu.discordmc.DiscordMC;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RateLimitException;
@@ -20,6 +23,7 @@ public class DiscordUtil {
             client.logout();
             return true;
         } catch (DiscordException ignored) {
+            DiscordMC.get().getLogger().log(Level.WARNING, "Failed to logout:", ignored);
             return false;
         }
     }
@@ -35,6 +39,7 @@ public class DiscordUtil {
             client.login();
             return true;
         } catch (DiscordException | RateLimitException ignored) {
+            DiscordMC.get().getLogger().log(Level.WARNING, "Failed to login:", ignored);
             return false;
         }
     }
