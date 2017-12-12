@@ -91,14 +91,14 @@ public class DiscordCommand implements CommandExecutor {
                 String name = lookupUser[0].getName();
                 Optional<String> game = lookupUser[0].getPresence().getPlayingText();
                 boolean isBot = lookupUser[0].isBot();
-                String id = lookupUser[0].getID();
+                String id = lookupUser[0].getStringID();
                 List<IRole> roles = lookupUser[0].getRolesForGuild(DiscordMC.getClient().getGuilds().get(0));
                 String discriminator = lookupUser[0].getDiscriminator();
                 IPresence presences = lookupUser[0].getPresence();
 
                 cs.sendMessage(ChatColor.BLUE + "Stats for user " + ChatColor.AQUA + name);
                 cs.sendMessage(ChatColor.BLUE + "> Roles: " + ChatColor.AQUA + StringUtils.join(roles, ", "));
-                cs.sendMessage(ChatColor.BLUE + "> Current game: " + ChatColor.AQUA + (game.isPresent() ? game.get() : "None"));
+                cs.sendMessage(ChatColor.BLUE + "> Current game: " + ChatColor.AQUA + (game.orElse("None")));
                 cs.sendMessage(ChatColor.BLUE + "> ID: " + ChatColor.AQUA + id);
                 cs.sendMessage(ChatColor.BLUE + "> Presence: " + ChatColor.AQUA + StringUtils.capitalize(presences.getStatus().name().toLowerCase()));
                 cs.sendMessage(ChatColor.BLUE + "> Is Bot: " + ChatColor.AQUA + StringUtils.capitalize(String.valueOf(isBot)));

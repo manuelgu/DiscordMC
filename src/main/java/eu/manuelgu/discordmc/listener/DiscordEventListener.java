@@ -1,21 +1,19 @@
 package eu.manuelgu.discordmc.listener;
 
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import eu.manuelgu.discordmc.DiscordMC;
+import eu.manuelgu.discordmc.MessageAPI;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import eu.manuelgu.discordmc.DiscordMC;
-import eu.manuelgu.discordmc.MessageAPI;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Status;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DiscordEventListener {
     private final DiscordMC plugin;
@@ -63,8 +61,8 @@ public class DiscordEventListener {
                 List<IRole> roleMentions = event.getMessage().getRoleMentions();
 
                 for (IUser u : mentions) {
-                    String name = u.getNicknameForGuild(event.getMessage().getGuild()).get();
-                    String id = u.getID();
+                    String name = u.getNicknameForGuild(event.getMessage().getGuild());
+                    String id = u.getStringID();
 
                     // User name
                     content = content.replaceAll("<@" + id + ">", "@" + name);
@@ -74,7 +72,7 @@ public class DiscordEventListener {
 
                 for (IRole r : roleMentions) {
                     String roleName = r.getName();
-                    String roleId = r.getID();
+                    String roleId = r.getStringID();
 
                     content = content.replaceAll("<@&" + roleId + ">", "@" + roleName);
                 }
@@ -82,8 +80,7 @@ public class DiscordEventListener {
                 final String finalContent = content;
                 final String nickname;
                 if (useNickname) {
-                    nickname = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild())
-                            .orElseGet(() -> event.getMessage().getAuthor().getName());
+                    nickname = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild());
                 } else {
                     nickname = event.getMessage().getAuthor().getName();
                 }
@@ -99,7 +96,7 @@ public class DiscordEventListener {
     @EventSubscriber
     public void onReady(ReadyEvent event) {
         // Set game to Minecraft
-        DiscordMC.getClient().changeStatus(Status.game("Minecraft"));
+        DiscordMC.getClient().changePlayingText("Minecraft");
 
         // Check for file encoder (emoji-related)
         switch (System.getProperty("file.encoding")) {

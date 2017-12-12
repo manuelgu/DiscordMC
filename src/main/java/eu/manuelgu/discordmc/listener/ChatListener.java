@@ -71,7 +71,7 @@ public class ChatListener implements Listener {
                     List<IUser> users = DiscordMC.getClient().getGuilds().get(0).getUsersByName(s, true);
 
                     if (!users.isEmpty()) {
-                        formattedMessage = formattedMessage.replaceAll("@" + s, "<@" + users.get(0).getID() + ">");
+                        formattedMessage = formattedMessage.replaceAll("@" + s, "<@" + users.get(0).getStringID() + ">");
                     }
                 }
             }
