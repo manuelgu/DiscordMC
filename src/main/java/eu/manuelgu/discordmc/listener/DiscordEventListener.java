@@ -78,9 +78,15 @@ public class DiscordEventListener {
                 }
 
                 final String finalContent = content;
+                final boolean checkNickName;
                 final String nickname;
                 if (useNickname) {
-                    nickname = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild());
+                    checkNickName = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild()) == null;
+                    if(checkNickName) {
+						nickname = event.getMessage().getAuthor().getName();
+					} else {
+						nickname = event.getMessage().getAuthor().getNicknameForGuild(event.getMessage().getGuild());
+					}
                 } else {
                     nickname = event.getMessage().getAuthor().getName();
                 }
