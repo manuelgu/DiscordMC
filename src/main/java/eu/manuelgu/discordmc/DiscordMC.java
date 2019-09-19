@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -19,7 +20,6 @@ import eu.manuelgu.discordmc.listener.BukkitEventListener;
 import eu.manuelgu.discordmc.listener.ChatListener;
 import eu.manuelgu.discordmc.listener.DiscordEventListener;
 import eu.manuelgu.discordmc.update.Updater;
-import gnu.trove.set.hash.THashSet;
 import lombok.Getter;
 import sx.blah.discord.Discord4J;
 import sx.blah.discord.api.ClientBuilder;
@@ -121,8 +121,8 @@ public class DiscordMC extends JavaPlugin {
         // Initialize messaging API
         new MessageAPI(this);
 
-        cachedHasChatPermission = new THashSet<>();
-        subscribedPlayers = new THashSet<>();
+        cachedHasChatPermission = new HashSet<>();
+        subscribedPlayers = new HashSet<>();
 
         String token = getConfig().getString("settings.token");
 

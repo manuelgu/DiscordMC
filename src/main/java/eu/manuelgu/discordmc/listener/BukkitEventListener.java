@@ -7,9 +7,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,12 +24,12 @@ import eu.manuelgu.discordmc.DiscordMC;
 import eu.manuelgu.discordmc.MessageAPI;
 import eu.manuelgu.discordmc.update.Updater;
 import lombok.Getter;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
-import net.minecraft.server.v1_12_R1.MinecraftServer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
-import net.minecraft.server.v1_12_R1.PlayerConnection;
-import net.minecraft.server.v1_12_R1.PlayerInteractManager;
-import net.minecraft.server.v1_12_R1.WorldServer;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.MinecraftServer;
+import net.minecraft.server.v1_14_R1.PacketPlayOutPlayerInfo;
+import net.minecraft.server.v1_14_R1.PlayerConnection;
+import net.minecraft.server.v1_14_R1.PlayerInteractManager;
+import net.minecraft.server.v1_14_R1.WorldServer;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.StatusType;
 
@@ -63,7 +63,7 @@ public class BukkitEventListener implements Listener {
             DiscordMC.getSubscribedPlayers().add(event.getPlayer().getUniqueId());
         }
 
-        if (!showDiscordUsersInTablist) {
+        if (showDiscordUsersInTablist) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -86,7 +86,7 @@ public class BukkitEventListener implements Listener {
                                     prefix = tablistPlayerPrefix;
                                 }
 
-                                String s = prefix + user.getNicknameForGuild(DiscordMC.getGuild());
+                                String s = prefix + user.getDisplayName(DiscordMC.getGuild());
                                 s = s.substring(0, Math.min(s.length(), 15));
                                 GameProfile profile = new GameProfile(UUID.randomUUID(), s);
                                 PlayerInteractManager manager = new PlayerInteractManager(world);
